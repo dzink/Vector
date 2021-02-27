@@ -6,7 +6,8 @@
     "nodemon": "^2.0.2"
   },
   "scripts": {
-    "test": "nodemon"
+    "test": "nodemon",
+    "watch": "nodemon",
   },
   "author": "dzink",
   "license": "ISC",
