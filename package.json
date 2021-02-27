@@ -13,7 +13,7 @@
   "license": "ISC",
   "nodemonConfig": {
     "watch": ".",
-    "exec": "sclang  -D src/tests/test.sc.nocompile --class UnitTest",
+    "exec": "clear && src/tests/test.sc.nocompile",
     "ext": "sc,nocompile",
     "ignore": [
       ".git/*"
