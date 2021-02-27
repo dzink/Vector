@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "nodemon",
-    "watch": "nodemon",
+    "watch": "nodemon"
   },
   "author": "dzink",
   "license": "ISC",
