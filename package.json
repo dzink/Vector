@@ -13,7 +13,7 @@
   "license": "ISC",
   "nodemonConfig": {
     "watch": ".",
-    "exec": "clear && src/tests/test.sc.nocompile",
+    "exec": "clear && src/tests/test.scd",
     "ext": "sc,nocompile",
     "ignore": [
       ".git/*"

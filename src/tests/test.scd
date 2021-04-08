@@ -1,7 +1,7 @@
 #! /usr/local/bin/sclang -D
 
 (
-var testClass = UnitTest;
+var testClass = DataTreeAbstractTest;
 var timeout = 10;
 var timeoutIncrement = 0.5;
 var report = false;
@@ -25,7 +25,7 @@ var report = false;
       report = true;
     };
 
-    // try {
+    try {
       // "Running subtests for % class...".format(testClass).postln;
       Process.tailCallOptimize = false;
       forkIfNeeded {
@@ -51,11 +51,11 @@ var report = false;
               };
             };
             if (status) {
-              if (report) {
-                subClass.report;
-              };
               testCount = testCount - 1;
               if (testCount == 0) {
+                if (report) {
+                  testClass.report;
+                };
                 0.exit;
               };
             };
@@ -63,16 +63,13 @@ var report = false;
           };
         };
       };
-      // "TEST COMPLETE".postln;
-      // 0.1.wait;
-      // 0.exit;
-    /*} {
+    } {
       arg error;
       "Completed with errors".postln;
       error.reportError;
       error.class.postln;
       0.1.wait;
       0.exit;
-    };*/
+    };
   }.fork;
 )
