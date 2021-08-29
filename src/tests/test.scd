@@ -1,7 +1,7 @@
 #! /usr/local/bin/sclang -D
 
 (
-var testClass = DataTreeAbstractTest;
+var testClass = VectorAbstractTest;
 var timeout = 10;
 var timeoutIncrement = 0.5;
 var report = false;
