@@ -54,8 +54,8 @@ MatrixTest : VectorAbstractTest {
 	test_vectorRow {
 		m = Matrix[[0, 1, 4], [2, 4, 5]];
 
-		this.assertEquals(m.rows(), 3, "Matrices accurately count rows.");
-		this.assertEquals(m.row(0), Vector[0, 2], "Matrices can get rows.");
+		this.assertEquals(m.rowSize(), 3, "Matrices accurately count rowSize.");
+		this.assertEquals(m.row(0), Vector[0, 2], "Matrices can get rowSize.");
 	}
 
 	test_vectorProduct {
@@ -83,12 +83,37 @@ MatrixTest : VectorAbstractTest {
 		solution = m.solve(v);
 
 		this.assertEquals(m.augment(v), Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2], [-1, 1, 2]], "Matrix is augmented properly");
-		this.assertEquals(m.augment(v).reduce, Matrix[[1, 0, 0], [3, -4, 0], [5, -11, -11.25], [-1, 3, 5.25]], "Matrix is reduced properly.");
+		this.assertEquals(m.augment(v).rowEchelon, Matrix[[1, 0, 0], [3, -4, 0], [5, -11, -11.25], [-1, 3, 5.25]], "Matrix is rowEchelond properly.");
 
 		(m.transposition).do {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
 		};
+	}
+
+	test_norm {
+		m = Matrix[[1, 2, 3, -1],
+			[2, -1, -4, 8],
+			[-1, 1, 3, -5],
+			[-1, 2, 5, -6],
+			[-1, -2, -3, 1]];
+			m.print;
+		this.assertFloatEquals(m.l1(), 15, "L1 norm is accurately calculated.");
+		this.assertFloatEquals((m * 5).l1, 75, "L1 norm is correctly scaled");
+		this.assertFloatEquals(m.infNorm(), 21, "InfNorm is accurately calculated.");
+		this.assertFloatEquals((m * 5).infNorm, 105, "InfNorm is correctly scaled");
+		this.assertFloatEquals(m.froNorm(), 14.730919862656, "FroNorm is accurately calculated.");
+		this.assertFloatEquals((m * 5).froNorm, 73.654599313281, "FroNorm is correctly scaled");
+	}
+
+	test_rref {
+		m = Matrix[[1, 2, 3, -1],
+            [2, -1, -4, 8],
+            [-1, 1, 3, -5],
+            [-1, 2, 5, -6],
+            [-1, -2, -3, 1]];
+		// m.reducedRowEchelon().print;
+		// m.rowEchelon().print;
 	}
 
 }

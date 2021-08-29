@@ -32,7 +32,7 @@ Matrix[slot] : Array {
 		^ this.scalar(size, 1);
 	}
 
-	rows {
+	rowSize {
 		this.do {
 			arg vector;
 			if (vector.notNil) {
@@ -50,9 +50,18 @@ Matrix[slot] : Array {
 		}.asVector();
 	}
 
+	rows {
+		var rows = Matrix(this.rowSize());
+		(this.rowSize).do {
+			arg rowIndex;
+			rows.add(this.row(rowIndex));
+		};
+		^ rows;
+	}
+
 	transposition {
-		var new = Matrix(this.rows());
-		this.rows.do {
+		var new = Matrix(this.rowSize());
+		this.rowSize.do {
 			arg vector, rowIndex;
 			new.add(this.row(rowIndex));
 		}
@@ -167,8 +176,8 @@ Matrix[slot] : Array {
 	matrixProduct {
 		arg other;
 		var product = Matrix(this.size, this.vectorSize);
-		var result = Matrix.newClear(this.rows, other.size);
-		this.rows.do {
+		var result = Matrix.newClear(this.rowSize, other.size);
+		this.rowSize.do {
 			arg thisIndex;
 			var rowVector = this.row(thisIndex);
 			other.do {
@@ -203,11 +212,11 @@ Matrix[slot] : Array {
 	/**
 	 * Perform a gaussian reduction on a matrix.
 	 */
-	reduce {
+	rowEchelon {
 		var result = this.copy;
-		(0..(result.rows - 2)).do {
+		(0..(result.rowSize - 2)).do {
 			arg i;
-			(i..(result.rows - 2)).do {
+			(i..(result.rowSize - 2)).do {
 				arg j;
 				var rowIndex = j + 1;
 				if (result[i][rowIndex] != 0) {
@@ -220,29 +229,39 @@ Matrix[slot] : Array {
 		^ result;
 	}
 
+	reducedRowEchelon {
+		var result = this.rowEchelon;
+		result.rowSize.do {
+			arg i;
+			var vector = result.row(i);
+			vector = vector / vector[i];
+			result.putRow(i, vector);
+		};
+		^ result;
+	}
+
 	/**
 	 * Solve a set of matrix equations using a gaussian reduction and then backsolving.
 	 */
 	solve {
 		arg solutionVector;
 		var solutions = Vector.fill(this.size, 0);
-		var reduced = this.augment(solutionVector).reduce();
+		var reduced = this.augment(solutionVector).reducedRowEchelon();
 
-		// Address the reduced rows in reverse order like you learned in Linear algebra.
-		((reduced.rows - 1)..0).do {
+		// Address the reduced rowSize in reverse order like you learned in Linear algebra.
+		((reduced.rowSize - 1)..0).do {
 			arg rowIndex;
 			var vector = reduced.row(rowIndex);
-			var farSide, sum, scalar;
+			var farSide, sum;
 			farSide = vector.pop;
 			sum = farSide - solutions.dot(vector);
-			scalar = vector[rowIndex];
-			solutions[rowIndex] = sum / scalar;
+			solutions[rowIndex] = sum;
 		};
 		^ solutions;
 	}
 
 	print {
-		this.rows.do {
+		this.rowSize.do {
 			arg i;
 			var string = "|  ";
 			this.row(i).do {
@@ -251,5 +270,47 @@ Matrix[slot] : Array {
 			};
 			string.postln;
 		};
+	}
+
+	pivots {
+		var pivots = List[];
+		this.do {
+			arg vector, i;
+			if (vector[i] == 1) {
+				pivots.add(i);
+			};
+		}
+		^ pivots;
+	}
+
+	/**
+	 Frobenius norm.
+	 */
+	froNorm {
+		var f = this.flatten.postln;
+		^ f.collect({
+			arg n;
+			n.squared;
+		}).sum.sqrt;
+	}
+
+	infNorm {
+		var max = 0;
+		this.rows().do {
+			arg vector;
+			var sum = vector.abs().sum();
+			max = max(sum, max);
+		};
+		^ max
+	}
+
+	l1 {
+		var max = 0;
+		this.do {
+			arg vector;
+			var sum = vector.abs().sum();
+			max = max(sum, max);
+		};
+		^ max
 	}
 }
