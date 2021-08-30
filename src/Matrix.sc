@@ -55,6 +55,16 @@ Matrix[slot] : Array {
 		^ this;
 	}
 
+	// COLUMN OPERATIONS
+
+	chop {
+		arg first = 0, last = inf;
+		if (last == inf) {
+			last = this.size;
+		};
+		^ this[first..last];
+	}
+
 	// ROW OPERATIONS
 
 	/**
@@ -205,8 +215,8 @@ Matrix[slot] : Array {
 		arg other;
 		var result;
 
-		if (this.rowSize != other.size) {
-			Exception("% product requires equal row (%) and other column (%) sizes.".format(this.class, this.rowSize, other.size)).throw();
+		if (this.size != other.rowSize) {
+			Exception("% product requires equal row (%) and other column (%) sizes.".format(this.class, this.size.cs, other.row.cs)).throw();
 		};
 
 		result = Matrix.newClear(this.rowSize, other.size);
@@ -237,56 +247,77 @@ Matrix[slot] : Array {
 	augment {
 		arg other;
 		var m = this.deepCopy();
+		^ m.pr_augment(other);
+	}
+
+	pr_augment {
+		arg other;
 		other = other.asMatrix.deepCopy();
-		if (m.size + other.size > m.maxSize) {
-			m.grow(other.size);
+		if (this.size + other.size > this.maxSize) {
+			this.grow(other.size);
 		};
-		m = m.addAll(*other);
-		^ m;
+		^ this.addAll(*other);
 	}
 
 	inverse {
 		var m = this.deepCopy();
 		m = m.augment(Matrix.identity(m.rowSize));
-		m.print;
+		m = m.pr_diagonal().pr_reduceAtDiagonal().chop(m.rowSize, inf);
 		^ m;
 	}
 
 	/**
 	 * Perform a gaussian reduction on a matrix.
 	 */
-	rowEchelon {
-		var result = this.copy;
-		(0..(result.rowSize - 2)).do {
+	upperRowEchelon {
+		var result = this.deepCopy();
+		^ result.pr_upperRowEchelon();
+	}
+
+	pr_upperRowEchelon {
+		(0..(this.rowSize - 2)).do {
 			arg sourceIndex;
-			((sourceIndex + 1)..(result.rowSize - 1)).do {
+			((sourceIndex + 1)..(this.rowSize - 1)).do {
 				arg rowIndex;
-				result.pr_calculateRowEchelonRow(sourceIndex, rowIndex);
+				this.pr_calculateRowEchelonRow(sourceIndex, rowIndex, sourceIndex);
 			}
 		};
-		^ result;
+		^ this;
+	}
+
+	rowEchelon {
+		^ this.upperRowEchelon();
 	}
 
 	lowerRowEchelon {
-		var result = this.copy;
-		((result.rowSize - 1)..1).do {
+		var result = this.deepCopy();
+		^ result.pr_lowerRowEchelon();
+	}
+
+	pr_lowerRowEchelon {
+		((this.rowSize - 1)..1).do {
 			arg sourceIndex;
 			((sourceIndex - 1)..0).do {
 				arg rowIndex;
-				result.pr_calculateRowEchelonRow(sourceIndex, rowIndex);
+				this.pr_calculateRowEchelonRow(sourceIndex, rowIndex, sourceIndex);
 			}
 		};
-		^ result;
+		^ this;
+	}
+
+	diagonal {
+		var m = this.deepCopy();
+		^ m.pr_diagonal();
+	}
+
+	pr_diagonal {
+		^ this.pr_upperRowEchelon().pr_lowerRowEchelon();
 	}
 
 	pr_calculateRowEchelonRow {
-		arg sourceIndex, rowIndex;
-		var diff = this[sourceIndex][rowIndex] / this[sourceIndex][sourceIndex];
+		arg sourceIndex, rowIndex, leftIndex;
+		var diff = this[leftIndex][rowIndex] / this[leftIndex][sourceIndex];
 		this.addRow(sourceIndex, rowIndex, diff.neg);
-	}
-
-	reducedRowEchelon {
-		^ this.rowEchelon().reduceAtDiagonal();
 	}
 
 	/**
@@ -294,11 +325,20 @@ Matrix[slot] : Array {
 	 */
 	reduceAtDiagonal {
 		var m = this.deepCopy();
-		m.rows.do {
+		^ m.pr_reduceAtDiagonal();
+	}
+
+	pr_reduceAtDiagonal {
+		this.rows.do {
 			arg vector, i;
-			m.scaleRow(i, vector[i].reciprocal);
+			this.scaleRow(i, vector[i].reciprocal);
 		};
-		^ m;
+		^ this;
+	}
+
+	reducedRowEchelon {
+		var m = this.deepCopy();
+		^ m.rowEchelon().pr_reduceAtDiagonal()
 	}
 
 	/**
@@ -319,6 +359,10 @@ Matrix[slot] : Array {
 			solutions[rowIndex] = sum;
 		};
 		^ solutions;
+	}
+
+	minors {
+
 	}
 
 	/**

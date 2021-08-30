@@ -59,6 +59,14 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m.row(2), Vector[4, 5], "Matrices can get rows.");
 	}
 
+	test_chop {
+		m = Matrix[[0, 1, 4], [2, 4, 5], [1, 2, 1], [3, 2, 6], [5, -1, 2]];
+		this.assertEquals(m.chop(0, 2), Matrix[[0, 1, 4], [2, 4, 5], [1, 2, 1]], "Chop removes end vectors.");
+		this.assertEquals(m.chop(3, inf), Matrix[[3, 2, 6], [5, -1, 2]], "Chop removes start vectors.");
+		this.assertEquals(m.chop(1, 3), Matrix[[2, 4, 5], [1, 2, 1], [3, 2, 6]], "Chop removes start and end vectors.");
+		this.assertEquals(m.size, 5, "Chop doesn't affect the original matrix.");
+	}
+
 	test_rowOperations {
 		m = Matrix[[0, 1, 4], [2, 4, 5]];
 		m.swapRow(0, 2);
@@ -99,6 +107,13 @@ MatrixTest : VectorAbstractTest {
 		var m2 = Matrix[[1, 2], [3, 1]];
 		m = Matrix[[0, 1], [2, 4.1]];
 		this.assertEquals(m.hadamard(m2), Matrix[[0, 2], [6, 4.1]], "Hadamard product is accurately calculated.");
+	}
+
+	test_echelon {
+		m = Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2]];
+		this.assertEquals(m.lowerRowEchelon(), Matrix[Vector[ 4.5, 2.5, 1.0 ], Vector[ 0.0, 5.0, 6.0 ], Vector[ 0.0, 0.0, 2.0 ]], "Lower row echelon format is successful.");
+		this.assertEquals(m.upperRowEchelon(), Matrix[Vector[ 1.0, 0.0, 0.0 ], Vector[ 3.0, -4.0, 0.0 ], Vector[ 5.0, -11.0, -11.25 ]], "Upper row echelon format is successful.");
+		this.assertEquals(m.diagonal(), Matrix[Vector[ 1.0, 0.0, 0.0 ], Vector[ 0.0, -4.0, 0.0 ], Vector[ 0.0, 0.0, -11.25 ] ], "Diagonal format is successful.");
 	}
 
 	test_solve {
@@ -143,10 +158,20 @@ MatrixTest : VectorAbstractTest {
 	}
 
 	test_inverse {
-		m = Matrix[[3, 2, 0], [0, 0, 1], [-2, -2, 1]];
-		// m.print;
-		m.inverse;
+		m = Matrix[[1, 2, 1],
+              [-4, 4, 5],
+              [6, 7, 7]];
+		this.assertEquals(m.inverse.product(m), Matrix.identity(3), "Inverse creates a proper inverse");
+	}
 
+	test_mapping {
+		var m1 = Matrix[[-1], [0], [1]];
+		var m2 = Matrix[[-3, 0, 2]];
+		var t = Matrix.scalar(3, -1);
+		t.print;
+		// m1.product(t).print;
+		// t.product(m1 + m2).postln;
+		// t.product(m1) + t.product(m2).postln;
 	}
 
 }
