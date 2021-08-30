@@ -55,7 +55,24 @@ MatrixTest : VectorAbstractTest {
 		m = Matrix[[0, 1, 4], [2, 4, 5]];
 
 		this.assertEquals(m.rowSize(), 3, "Matrices accurately count rowSize.");
-		this.assertEquals(m.row(0), Vector[0, 2], "Matrices can get rowSize.");
+		this.assertEquals(m.row(0), Vector[0, 2], "Matrices can get rows.");
+		this.assertEquals(m.row(2), Vector[4, 5], "Matrices can get rows.");
+	}
+
+	test_rowOperations {
+		m = Matrix[[0, 1, 4], [2, 4, 5]];
+		m.swapRow(0, 2);
+		this.assertEquals(m.row(0), Vector[4, 5], "First row is swapped.");
+		this.assertEquals(m.row(2), Vector[0, 2], "Second row is swapped.");
+		this.assertEquals(m.row(1), Vector[1, 4], "Middle row is unchanged.");
+
+		m.scaleRow(0, -2);
+		this.assertEquals(m.row(0), Vector[-8, -10], "Rows are scaled.");
+
+		m.addRow(0, 1, -0.5);
+		this.assertEquals(m.row(1), Vector[5, 9], "Row 1 is scaled and added to row 2.");
+		this.assertEquals(m.row(0), Vector[-8, -10], "Row 1 is unchanged.");
+
 	}
 
 	test_vectorProduct {
@@ -80,11 +97,12 @@ MatrixTest : VectorAbstractTest {
 		var v = Vector[-1, 1, 2];
 		var solution;
 		m = Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2]];
-		solution = m.solve(v);
 
 		this.assertEquals(m.augment(v), Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2], [-1, 1, 2]], "Matrix is augmented properly");
-		this.assertEquals(m.augment(v).rowEchelon, Matrix[[1, 0, 0], [3, -4, 0], [5, -11, -11.25], [-1, 3, 5.25]], "Matrix is rowEchelond properly.");
+		this.assertEquals(m.augment(v).rowEchelon, Matrix[[1, 0, 0], [3, -4, 0], [5, -11, -11.25], [-1, 3, 5.25]], "Matrix is converted to row echelon format properly.");
+		this.assertEquals(m.augment(v).reducedRowEchelon, Matrix[Vector[1.0, -0.0, -0.0], Vector[3.0, 1.0, -0.0], Vector[5.0, 2.75, 1.0], Vector[-1.0, -0.75, -0.46666666865349]], "Matrix is reduced row echelon format properly.");
 
+		solution = m.solve(v);
 		(m.transposition).do {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
@@ -97,7 +115,7 @@ MatrixTest : VectorAbstractTest {
 			[-1, 1, 3, -5],
 			[-1, 2, 5, -6],
 			[-1, -2, -3, 1]];
-			m.print;
+
 		this.assertFloatEquals(m.l1(), 15, "L1 norm is accurately calculated.");
 		this.assertFloatEquals((m * 5).l1, 75, "L1 norm is correctly scaled");
 		this.assertFloatEquals(m.infNorm(), 21, "InfNorm is accurately calculated.");
@@ -114,6 +132,13 @@ MatrixTest : VectorAbstractTest {
             [-1, -2, -3, 1]];
 		// m.reducedRowEchelon().print;
 		// m.rowEchelon().print;
+	}
+
+	test_inverse {
+		m = Matrix[[3, 2, 0], [0, 0, 1], [-2, -2, 1]];
+		// m.print;
+		m.inverse;
+
 	}
 
 }

@@ -7,6 +7,15 @@ Vector[float] : FloatArray {
     ^ v;
   }
 
+  addSafe {
+    arg element;
+    if (this.size + 1 > this.maxSize) {
+      this.grow(1);
+    };
+    this.add(element);
+    ^ this;
+  }
+
   //
   // clear {
   //   for (0, this.maxSize, {
@@ -93,6 +102,10 @@ Vector[float] : FloatArray {
     ^ inner / normProduct;
   }
 
+  homogenous {
+    ^ this.copy.addSafe(1);
+  }
+
   performBinaryOp {
     arg aSelector, theOperand, adverb;
     var result = super.performBinaryOp(aSelector, theOperand, adverb);
@@ -125,5 +138,9 @@ Vector[float] : FloatArray {
   != {
     arg other, sensitivity = 0.0001;
     ^ this.perform('==', other, sensitivity).not();
+  }
+
+  asMatrix {
+    ^ Matrix[this];
   }
 }

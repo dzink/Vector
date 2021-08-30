@@ -32,54 +32,15 @@ Matrix[slot] : Array {
 		^ this.scalar(size, 1);
 	}
 
-	rowSize {
-		this.do {
-			arg vector;
-			if (vector.notNil) {
-				^ vector.size;
-			};
-		};
-		^ 0;
-	}
+	// PUT operations
 
-	row {
-		arg index;
-		^ this.collect {
-			arg vector;
-			vector[index];
-		}.asVector();
-	}
-
-	rows {
-		var rows = Matrix(this.rowSize());
-		(this.rowSize).do {
-			arg rowIndex;
-			rows.add(this.row(rowIndex));
-		};
-		^ rows;
-	}
-
-	transposition {
-		var new = Matrix(this.rowSize());
-		this.rowSize.do {
-			arg vector, rowIndex;
-			new.add(this.row(rowIndex));
-		}
-		^ new;
-	}
-
+	/**
+	 * Override to superclass to ensure that only vectors are added to the matrix.
+	 */
 	put {
 		arg n, vector;
 		super.put(n, vector.asVector);
 		^ this;
-	}
-
-	putRow {
-		arg n, vector;
-		vector.do {
-			arg element, index;
-			this[index][n] = element;
-		};
 	}
 
 	insert {
@@ -94,6 +55,106 @@ Matrix[slot] : Array {
 		^ this;
 	}
 
+	// ROW OPERATIONS
+
+	/**
+	 * Get the number of rows in the matrix.
+	 */
+	rowSize {
+		this.do {
+			arg vector;
+			if (vector.notNil) {
+				^ vector.size;
+			};
+		};
+		^ 0;
+	}
+
+	/**
+	 * Return a given row as a vertex.
+	 */
+	row {
+		arg index;
+		^ this.collect {
+			arg vector;
+			vector[index];
+		}.asVector();
+	}
+
+	/**
+	 * Get an array of all rows.
+	 */
+	rows {
+		var rows = Matrix(this.rowSize());
+		(this.rowSize).do {
+			arg rowIndex;
+			rows.add(this.row(rowIndex));
+		};
+		^ rows;
+	}
+
+	/**
+	 * Put a row into a given index in the matrix.
+	 */
+	putRow {
+		arg n, vector;
+		vector.do {
+			arg element, index;
+			this[index][n] = element;
+		};
+	}
+
+	/**
+	 * Swap two given rows in place.
+	 */
+	swapRow {
+		arg rowId1, rowId2;
+		var row1 = this.row(rowId1);
+		var row2 = this.row(rowId2);
+		this.putRow(rowId2, row1);
+		this.putRow(rowId1, row2);
+		^ this;
+	}
+
+	/**
+	 * Scale a given row in place.
+	 */
+	scaleRow {
+		arg rowId, scalar = 1;
+		var vector = this.row(rowId);
+		vector = vector * scalar;
+		this.putRow(rowId, vector);
+		^ this;
+	}
+
+	/**
+	 * Add a scaled row to another row in place.
+	 */
+	addRow {
+		arg sourceRowId, targetRowId, scalar = 1;
+		var source = this.row(sourceRowId);
+		var target = this.row(targetRowId);
+		source = source * scalar;
+		target = target + source;
+		this.putRow(targetRowId, target);
+		^ this;
+	}
+
+
+
+	transposition {
+		var new = Matrix(this.rowSize());
+		this.rowSize.do {
+			arg vector, rowIndex;
+			new.add(this.row(rowIndex));
+		}
+		^ new;
+	}
+
+
+	/**
+	 * @TODO it would be nice to have a way to "check" a matrix but I'm not sure what that would look like at this time.
+	 */
 	checkVectors {
 		var size = nil;
 		this.do {
@@ -113,51 +174,9 @@ Matrix[slot] : Array {
 		^ this;
 	}
 
-	// dot {
-	// 	arg other;
-	// }
-	//
-	// rowVector {
-	// 	arg n;
-	// 	^ this.collect {
-	// 		arg column;
-	// 		column[n];
-	// 	};
-	// }
-	//
-	// inv {
-	//
-	// }
-
-	performBinaryOp {
-    arg aSelector, theOperand, adverb;
-    var result = super.performBinaryOp(aSelector, theOperand, adverb);
-    ^ this.class.newFrom(result);
-  }
-
-	performBinaryOpOnSimpleNumber {
-    arg aSelector, theOperand, adverb;
-    var result = super.performBinaryOpOnSimpleNumber(aSelector, theOperand, adverb);
-    ^ this.class.newFrom(result);
-  }
-
-	// == {
-	// 	arg other, sensitivity = 0.0001;
-	// 	if (other.size != this.size) {
-	// 		^ false;
-	// 	};
-	// 	this.do {
-	// 		arg vector, column;
-	// 		var otherVector = other[column];
-	// 		[\test, vector, otherVector].postln;
-	// 		if (vector.notNil) {
-	// 			if (vector != otherVector) {
-	// 				^ false;
-	// 			};
-	// 		};
-	// 	};
-	// 	^ true;
-	// }
+	/**
+	 * This is how SC will try to multiply arrays, sometimes you want this. Each cell is multiplied by the same cell in other, and a new matrix is returned.
+	 */
 	hadamard {
 		arg other;
 		^ super.perform('*', other);
@@ -165,12 +184,10 @@ Matrix[slot] : Array {
 
 	vectorProduct {
 		arg other;
-		// var vector = Vector.newClear(other.size);
 		^ other.collect {
 			arg scalar, index;
 			(this[index] * scalar);
 		}.sum;
-		// ^ vector;
 	}
 
 	matrixProduct {
@@ -199,13 +216,24 @@ Matrix[slot] : Array {
 		^ super.perform('*', other);
 	}
 
+	/**
+	 * Place a vertex or matrix to the right of this matrix and return a new matrix.
+	 */
 	augment {
-		arg vector;
+		arg other;
 		var m = this.deepCopy();
-		if (m.size + 1 > m.maxSize) {
-			m.grow(1);
+		other = other.asMatrix.deepCopy();
+		if (m.size + other.size > m.maxSize) {
+			m.grow(other.size);
 		};
-		m.add(vector.copy);
+		m = m.addAll(*other);
+		^ m;
+	}
+
+	inverse {
+		var m = this.deepCopy();
+		m = m.augment(Matrix.identity(m.rowSize));
+		m.print;
 		^ m;
 	}
 
@@ -221,8 +249,7 @@ Matrix[slot] : Array {
 				var rowIndex = j + 1;
 				if (result[i][rowIndex] != 0) {
 					var diff = result[i][rowIndex] / result[i][i];
-					var newRow = result.row(rowIndex) - (result.row(i) * diff);
-					result.putRow(rowIndex, newRow);
+					result.addRow(i, rowIndex, diff.neg);
 				};
 			}
 		};
@@ -234,8 +261,7 @@ Matrix[slot] : Array {
 		result.rowSize.do {
 			arg i;
 			var vector = result.row(i);
-			vector = vector / vector[i];
-			result.putRow(i, vector);
+			result.scaleRow(i, vector[i].reciprocal);
 		};
 		^ result;
 	}
@@ -260,18 +286,9 @@ Matrix[slot] : Array {
 		^ solutions;
 	}
 
-	print {
-		this.rowSize.do {
-			arg i;
-			var string = "|  ";
-			this.row(i).do {
-				arg element;
-				string = string ++ element.asString() ++ "  ";
-			};
-			string.postln;
-		};
-	}
-
+	/**
+	 * Return the pivots from a reduced echelon matrix.
+	 */
 	pivots {
 		var pivots = List[];
 		this.do {
@@ -283,11 +300,13 @@ Matrix[slot] : Array {
 		^ pivots;
 	}
 
+	// NORM OPERATIONS
+
 	/**
 	 Frobenius norm.
 	 */
 	froNorm {
-		var f = this.flatten.postln;
+		var f = this.flatten;
 		^ f.collect({
 			arg n;
 			n.squared;
@@ -312,5 +331,39 @@ Matrix[slot] : Array {
 			max = max(sum, max);
 		};
 		^ max
+	}
+
+	print {
+		this.rowSize.do {
+			arg i;
+			var string = "|  ";
+			this.row(i).do {
+				arg element;
+				string = string ++ element.asString() ++ "  ";
+			};
+			string.postln;
+		};
+	}
+
+	asMatrix {
+		^ this;
+	}
+
+	/**
+	 * An override to ensure that binary operations return a matrix and not an Array.
+	 */
+	performBinaryOp {
+		arg aSelector, theOperand, adverb;
+		var result = super.performBinaryOp(aSelector, theOperand, adverb);
+		^ this.class.newFrom(result);
+	}
+
+	/**
+	 * An override to ensure that binary operations return a matrix and not an Array.
+	 */
+	performBinaryOpOnSimpleNumber {
+		arg aSelector, theOperand, adverb;
+		var result = super.performBinaryOpOnSimpleNumber(aSelector, theOperand, adverb);
+		^ this.class.newFrom(result);
 	}
 }
