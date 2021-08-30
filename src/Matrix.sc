@@ -140,8 +140,19 @@ Matrix[slot] : Array {
 		^ this;
 	}
 
+	reverseRows {
+		var m = this.deepCopy();
+		var rowSize = m.rowSize();
+		rowSize.do {
+			arg i;
+			m.putRow(i, this.row(rowSize - 1 - i));
+		};
+		^ m;
+	}
 
-
+	/**
+	 * Transpose a matrix onto its side and return a new matrix.
+	 */
 	transposition {
 		var new = Matrix(this.rowSize());
 		this.rowSize.do {
@@ -192,11 +203,15 @@ Matrix[slot] : Array {
 
 	matrixProduct {
 		arg other;
-		var product = Matrix(this.size, this.vectorSize);
-		var result = Matrix.newClear(this.rowSize, other.size);
-		this.rowSize.do {
-			arg thisIndex;
-			var rowVector = this.row(thisIndex);
+		var result;
+
+		if (this.rowSize != other.size) {
+			Exception("% product requires equal row (%) and other column (%) sizes.".format(this.class, this.rowSize, other.size)).throw();
+		};
+
+		result = Matrix.newClear(this.rowSize, other.size);
+		this.rows.do {
+			arg rowVector, thisIndex;
 			other.do {
 				arg otherVector, otherIndex;
 				result[otherIndex][thisIndex] = rowVector.dot(otherVector);
@@ -243,27 +258,47 @@ Matrix[slot] : Array {
 	rowEchelon {
 		var result = this.copy;
 		(0..(result.rowSize - 2)).do {
-			arg i;
-			(i..(result.rowSize - 2)).do {
-				arg j;
-				var rowIndex = j + 1;
-				if (result[i][rowIndex] != 0) {
-					var diff = result[i][rowIndex] / result[i][i];
-					result.addRow(i, rowIndex, diff.neg);
-				};
+			arg sourceIndex;
+			((sourceIndex + 1)..(result.rowSize - 1)).do {
+				arg rowIndex;
+				result.pr_calculateRowEchelonRow(sourceIndex, rowIndex);
 			}
 		};
 		^ result;
 	}
 
-	reducedRowEchelon {
-		var result = this.rowEchelon;
-		result.rowSize.do {
-			arg i;
-			var vector = result.row(i);
-			result.scaleRow(i, vector[i].reciprocal);
+	lowerRowEchelon {
+		var result = this.copy;
+		((result.rowSize - 1)..1).do {
+			arg sourceIndex;
+			((sourceIndex - 1)..0).do {
+				arg rowIndex;
+				result.pr_calculateRowEchelonRow(sourceIndex, rowIndex);
+			}
 		};
 		^ result;
+	}
+
+	pr_calculateRowEchelonRow {
+		arg sourceIndex, rowIndex;
+		var diff = this[sourceIndex][rowIndex] / this[sourceIndex][sourceIndex];
+		this.addRow(sourceIndex, rowIndex, diff.neg);
+	}
+
+	reducedRowEchelon {
+		^ this.rowEchelon().reduceAtDiagonal();
+	}
+
+	/**
+	 * Reduce each row at pivots.
+	 */
+	reduceAtDiagonal {
+		var m = this.deepCopy();
+		m.rows.do {
+			arg vector, i;
+			m.scaleRow(i, vector[i].reciprocal);
+		};
+		^ m;
 	}
 
 	/**

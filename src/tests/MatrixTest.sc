@@ -72,7 +72,14 @@ MatrixTest : VectorAbstractTest {
 		m.addRow(0, 1, -0.5);
 		this.assertEquals(m.row(1), Vector[5, 9], "Row 1 is scaled and added to row 2.");
 		this.assertEquals(m.row(0), Vector[-8, -10], "Row 1 is unchanged.");
+	}
 
+	test_reverseRows {
+		m = Matrix[[0, 1, 4], [2, 4, 5]];
+		m = m.reverseRows();
+		this.assertEquals(m.row(0), Vector[4, 5], "Rows are in reverse order.");
+		this.assertEquals(m.row(1), Vector[1, 4], "Rows are in reverse order.");
+		this.assertEquals(m.row(2), Vector[0, 2], "Rows are in reverse order.");
 	}
 
 	test_vectorProduct {
@@ -84,7 +91,8 @@ MatrixTest : VectorAbstractTest {
 	test_matrixProduct {
 		var m2 = Matrix[[1, 2], [3, 1]];
 		m = Matrix[[0, 1], [2, 4.1]];
-		this.assertEquals(m.matrixProduct(m2), Matrix[[4, 9.2], [2, 7.1]], "Matrix product is accurately calculated.");
+		this.assertEquals(m.product(m2), Matrix[[4, 9.2], [2, 7.1]], "Matrix product is accurately calculated.");
+		this.assertEquals(m.product(Matrix.identity(m.rowSize)), m, "Identity leaves m intact");
 	}
 
 	test_hadamard {

@@ -143,4 +143,8 @@ Vector[float] : FloatArray {
   asMatrix {
     ^ Matrix[this];
   }
+
+  transposition {
+    ^ this.asMatrix.transposition;
+  }
 }
