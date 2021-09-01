@@ -9,17 +9,39 @@ MatrixTest : VectorAbstractTest {
 		m.free;
 	}
 
+	test_newClear {
+		m = Matrix.newClear(2, 3);
+		this.assertEquals(m.columnSize, 2, "Clear Matrix is the right column size.");
+		this.assertEquals(m.rowSize, 3, "Clear Matrix is the right rows size.");
+	}
+
 	test_set {
 		var v = Vector[3, 4, 5];
 		m = Matrix[[1, 2, 3], v, nil];
-		this.assertEquals(m.size, 3, "The new matrix is the correct size");
+		this.assertEquals(m.columnSize, 3, "The new matrix is the correct size");
 		this.assert(m[0].isKindOf(Vector), "Vectors are added");
 		this.assertEquals(m[1].identityHash, v.identityHash, "Actual objects are added when they are vectors");
+	}
+
+	test_rowsColumns {
+		m = Matrix.rows([1, 2, 3], [4, 5, 6], [7, 8, 9]);
+		this.assertEquals(m, Matrix[Vector[ 1.0, 4.0, 7.0 ], Vector[ 2.0, 5.0, 8.0 ], Vector[ 3.0, 6.0, 9.0 ]], "Creating matrix by rows works.");
+
+		m = Matrix.columns([1, 4, 7], [2, 5, 8], [3, 6, 9]);
+		this.assertEquals(m, Matrix[Vector[ 1.0, 4.0, 7.0 ], Vector[ 2.0, 5.0, 8.0 ], Vector[ 3.0, 6.0, 9.0 ]], "Creating matrix by columns works.");
 	}
 
 	test_identity {
 		m = Matrix.identity(4);
 		this.assertEquals(m, Matrix[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]], "Identity is set.");
+
+		m = Matrix.rows([1, 2, 4], [5, 6, 8]);
+		this.assertEquals(m * m.rightIdentity(), Matrix.rows([1, 2, 4], [5, 6, 8]), "Right identity retains original matrix with long matrix.");
+		this.assertEquals(m.leftIdentity() * m, Matrix.rows([1, 2, 4], [5, 6, 8]), "Left identity retains original matrix with long matrix.");
+
+		m = Matrix.columns([1, 2, 4], [5, 6, 8]);
+		this.assertEquals(m.leftIdentity * m, Matrix.columns([1, 2, 4], [5, 6, 8]), "Identity retains original matrix with tall matrix.");
+		this.assertEquals(m * m.rightIdentity, Matrix.columns([1, 2, 4], [5, 6, 8]), "Identity retains original matrix with tall matrix.");
 	}
 
 	test_scalar {
@@ -37,9 +59,6 @@ MatrixTest : VectorAbstractTest {
 		m = Matrix[[3, 1], [-3, 2]];
 		m = m + m2;
 		this.assertEquals(m , Matrix[[3, 3], [-2, 6]], "Matrices are added.");
-
-		m = m * m2;
-		this.assertEquals(m , Matrix[[0, 6], [-2, 24]], "Matrices are multiplied by a scalar.");
 	}
 
 	test_transposition {
@@ -90,17 +109,31 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m.row(2), Vector[0, 2], "Rows are in reverse order.");
 	}
 
+	test_compatible {
+		var m = Matrix[[3, 4, 5, 6], [7, 8, 9, 10]];
+		this.assert(m.compatibleWith(Matrix.columns([2, 1], [2, 1])), "4x2 is compatible with 2x2.");
+		this.assert(m.compatibleWith(Matrix.columns([2, 1], [2, 1], [2, 1])), "4x2 is compatible with 2x3.");
+		this.assert(m.notCompatibleWith(Matrix.columns([2, 1, 3], [2, 1, 9])), "4x2 is not compatible with 3x2.");
+
+		this.assert(m.compatibleWith(Vector[2, 3]), "4x2 is compatible R2 vector.");
+		this.assert(m.notCompatibleWith(Vector[2, 3, 5, 7]), "4x2 is not compatible with a R4 vector.");
+	}
+
 	test_vectorProduct {
 		var v = Vector[1, 2];
 		m = Matrix[[0, 1], [2, 4]];
 		this.assertEquals(m.vectorProduct(v), Vector[4, 9], "Vector product is accurately calculated.");
+		this.assertEquals(m * v, Vector[4, 9], "Vector product is accurately calculated with shorthand.");
+
+		this.assertException({m * Vector[1, 2, 3]}, Exception, "Accurately throws an exception when attempting to dot multiply incompatible vector.");
 	}
 
 	test_matrixProduct {
-		var m2 = Matrix[[1, 2], [3, 1]];
-		m = Matrix[[0, 1], [2, 4.1]];
-		this.assertEquals(m.product(m2), Matrix[[4, 9.2], [2, 7.1]], "Matrix product is accurately calculated.");
-		this.assertEquals(m.product(Matrix.identity(m.rowSize)), m, "Identity leaves m intact");
+		var m2 = Matrix.rows([1, 0, 1, 1], [2, 0, 1, -1], [3, 1, 0, 2]);
+		m = Matrix.rows([1, -1, 2], [0, -2, 1]);
+		this.assertEquals(m.product(m2), Matrix[ Vector[ 5.0, -1.0 ], Vector[ 2.0, 1.0 ], Vector[ 0.0, -2.0 ], Vector[ 6.0, 4.0 ] ], "Matrix product is accurately calculated.");
+		this.assertEquals(m * m2, Matrix[ Vector[ 5.0, -1.0 ], Vector[ 2.0, 1.0 ], Vector[ 0.0, -2.0 ], Vector[ 6.0, 4.0 ] ], "Matrix product is accurately calculated with shorthand.");
+		this.assertException({m * Matrix.rows([0, 2, 3, 5], [1, -1, 2, 7])}, Exception, "Accurately throws an exception when attempting to dot multiply incompatible matrix.");
 	}
 
 	test_hadamard {
@@ -147,31 +180,38 @@ MatrixTest : VectorAbstractTest {
 		this.assertFloatEquals((m * 5).froNorm, 73.654599313281, "FroNorm is correctly scaled");
 	}
 
-	test_rref {
-		m = Matrix[[1, 2, 3, -1],
-            [2, -1, -4, 8],
-            [-1, 1, 3, -5],
-            [-1, 2, 5, -6],
-            [-1, -2, -3, 1]];
-		// m.reducedRowEchelon().print;
-		// m.rowEchelon().print;
-	}
-
 	test_inverse {
 		m = Matrix[[1, 2, 1],
               [-4, 4, 5],
               [6, 7, 7]];
-		this.assertEquals(m.inverse.product(m), Matrix.identity(3), "Inverse creates a proper inverse");
+		this.assertEquals((m.inverse * m).class, Matrix, "Inverse returns a Matrix");
+		this.assertEquals((m.inverse * m), Matrix.identity(3), "Inverse creates a proper inverse");
 	}
+	//
+	// test_mapping {
+	// 	var m1 = Matrix[[-1], [0], [1]];
+	// 	var m2 = Matrix[[-3, 0, 2]];
+	// 	var t = Matrix.scalar(3, -1);
+	// 	t.print;
+	// 	m1.product(t).print;
+	// 	// t.product(m1 + m2).postln;
+	// 	// t.product(m1) + t.product(m2).postln;
+	// }
 
-	test_mapping {
-		var m1 = Matrix[[-1], [0], [1]];
-		var m2 = Matrix[[-3, 0, 2]];
-		var t = Matrix.scalar(3, -1);
-		t.print;
-		// m1.product(t).print;
-		// t.product(m1 + m2).postln;
-		// t.product(m1) + t.product(m2).postln;
-	}
+	// A benchmark for solving algorithms.
+	// test_bench {
+	// 	var n = 0;
+	// 	var v = Vector[-1, 1, 2];
+	// 	m = Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2]];
+	// 	m = m.augment(v);
+	// 	m.print;
+	// 	{n.do {
+	// 		m.reducedRowEchelon.pr_backsolve.postln;
+	// 	}}.bench;
+	// 	{n.do {
+	// 		m.diagonal.reduceAtDiagonal.last.postln;
+	// 	}}.bench;
+	// }
+
 
 }

@@ -32,6 +32,27 @@ Matrix[slot] : Array {
 		^ this.scalar(size, 1);
 	}
 
+	*columns {
+		arg ... columns;
+		var m = this.new();
+		columns.do {
+			arg column;
+			m.grow(1);
+			m.add(column);
+		};
+		^ m;
+	}
+
+	*rows {
+		arg ... rows;
+		var m = this.newClear(rows[0].size, rows.size);
+		rows.do {
+			arg row, i;
+			m.putRow(i, row);
+		};
+		^ m;
+	}
+
 	// PUT operations
 
 	/**
@@ -60,7 +81,7 @@ Matrix[slot] : Array {
 	chop {
 		arg first = 0, last = inf;
 		if (last == inf) {
-			last = this.size;
+			last = this.columnSize;
 		};
 		^ this[first..last];
 	}
@@ -78,6 +99,14 @@ Matrix[slot] : Array {
 			};
 		};
 		^ 0;
+	}
+
+	dimensions {
+		^ this.rowSize();
+	}
+
+	columnSize {
+		^ this.size;
 	}
 
 	/**
@@ -172,6 +201,38 @@ Matrix[slot] : Array {
 		^ new;
 	}
 
+	/**
+	 * Place a vertex or matrix to the right of this matrix and return a new matrix.
+	 */
+	augment {
+		arg other;
+		var m = this.deepCopy();
+		^ m.pr_augment(other);
+	}
+
+	pr_augment {
+		arg other;
+		other = other.asMatrix.deepCopy();
+		if (this.columnSize + other.columnSize > this.maxSize) {
+			this.grow(other.columnSize);
+		};
+		^ this.addAll(*other);
+	}
+
+	/**
+	 * Convenience methods to create the right kinds of identities based on the current matrix.
+	 */
+	identity {
+		^ this.rightIdentity();
+	}
+
+	leftIdentity {
+		^ Matrix.identity(this.rowSize);
+	}
+
+	rightIdentity {
+		^ Matrix.identity(this.columnSize);
+	}
 
 	/**
 	 * @TODO it would be nice to have a way to "check" a matrix but I'm not sure what that would look like at this time.
@@ -200,34 +261,51 @@ Matrix[slot] : Array {
 	 */
 	hadamard {
 		arg other;
-		^ super.perform('*', other);
+		^ (this.asArray * other.asArray).asMatrix;
+		// ^ super.perform('*', other);
 	}
 
 	vectorProduct {
 		arg other;
+
+		if (this.notCompatibleWith(other)) {
+			Exception("% * % product requires equal column (%) and vector (%) sizes.".format(this.class, other.class, this.columnSize, other.size)).throw();
+		};
+
 		^ other.collect {
 			arg scalar, index;
 			(this[index] * scalar);
 		}.sum;
 	}
 
+	compatibleWith {
+		arg other;
+		if (other.isKindOf(Matrix)) {
+			^ (this.columnSize() === other.rowSize());
+		};
+		if (other.isKindOf(Vector)) {
+			^ (this.columnSize() === other.size());
+		};
+		^ true;
+	}
+
+	notCompatibleWith {
+		arg other;
+		^ this.compatibleWith(other).not();
+	}
+
 	matrixProduct {
 		arg other;
 		var result;
 
-		if (this.size != other.rowSize) {
-			Exception("% product requires equal row (%) and other column (%) sizes.".format(this.class, this.size.cs, other.row.cs)).throw();
+		if (this.notCompatibleWith(other)) {
+			Exception("% * % product requires equal column (%) and row (%) sizes.".format(this.class, other.class, this.columnSize.cs, other.rowSize.cs)).throw();
 		};
 
-		result = Matrix.newClear(this.rowSize, other.size);
-		this.rows.do {
-			arg rowVector, thisIndex;
-			other.do {
-				arg otherVector, otherIndex;
-				result[otherIndex][thisIndex] = rowVector.dot(otherVector);
-			};
-		};
-		^ result;
+		^ other.collect {
+			arg otherVector;
+			this.vectorProduct(otherVector);
+		}.asMatrix();
 	}
 
 	product {
@@ -239,24 +317,6 @@ Matrix[slot] : Array {
 			^ this.matrixProduct(other);
 		};
 		^ super.perform('*', other);
-	}
-
-	/**
-	 * Place a vertex or matrix to the right of this matrix and return a new matrix.
-	 */
-	augment {
-		arg other;
-		var m = this.deepCopy();
-		^ m.pr_augment(other);
-	}
-
-	pr_augment {
-		arg other;
-		other = other.asMatrix.deepCopy();
-		if (this.size + other.size > this.maxSize) {
-			this.grow(other.size);
-		};
-		^ this.addAll(*other);
 	}
 
 	inverse {
@@ -343,16 +403,20 @@ Matrix[slot] : Array {
 
 	/**
 	 * Solve a set of matrix equations using a gaussian reduction and then backsolving.
+	 * Another option is m.diagonal.reduceAtDiagonal.last - this takes 50% longer, @TODO look into relative accuracy
 	 */
 	solve {
 		arg solutionVector;
-		var solutions = Vector.fill(this.size, 0);
 		var reduced = this.augment(solutionVector).reducedRowEchelon();
+		^ reduced.pr_backsolve();
+	}
 
+	pr_backsolve{
+		var solutions = Vector.fill(this.columnSize - 1, 0);
 		// Address the reduced rowSize in reverse order like you learned in Linear algebra.
-		((reduced.rowSize - 1)..0).do {
+		((this.rowSize - 1)..0).do {
 			arg rowIndex;
-			var vector = reduced.row(rowIndex);
+			var vector = this.row(rowIndex);
 			var farSide, sum;
 			farSide = vector.pop;
 			sum = farSide - solutions.dot(vector);
@@ -367,6 +431,7 @@ Matrix[slot] : Array {
 
 	/**
 	 * Return the pivots from a reduced echelon matrix.
+	 * @TODO this is wrong, I think
 	 */
 	pivots {
 		var pivots = List[];
@@ -428,12 +493,31 @@ Matrix[slot] : Array {
 		^ this;
 	}
 
+	asArray {
+		var a = Array(this.size);
+		this.do {
+			arg vector;
+			a.add(vector.asArray);
+		};
+		^ a;
+	}
+
 	/**
 	 * An override to ensure that binary operations return a matrix and not an Array.
+	 * Make sure to use dot products on multiplication of vectors and matrices.
 	 */
 	performBinaryOp {
 		arg aSelector, theOperand, adverb;
-		var result = super.performBinaryOp(aSelector, theOperand, adverb);
+		var result;
+		if (aSelector === '*') {
+			if (theOperand.isKindOf(Vector)) {
+				^ this.vectorProduct(theOperand);
+			};
+			if (theOperand.isKindOf(Matrix)) {
+				^ this.matrixProduct(theOperand);
+			};
+		};
+		result = super.performBinaryOp(aSelector, theOperand, adverb);
 		^ this.class.newFrom(result);
 	}
 
@@ -445,4 +529,5 @@ Matrix[slot] : Array {
 		var result = super.performBinaryOpOnSimpleNumber(aSelector, theOperand, adverb);
 		^ this.class.newFrom(result);
 	}
+
 }

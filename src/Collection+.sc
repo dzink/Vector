@@ -6,6 +6,14 @@
 		}
 		^ v;
 	}
+
+	asMatrix {
+		var m = this;
+		if (m.isKindOf(Matrix).not) {
+			m = Matrix.newFrom(m);
+		};
+		^ m;
+	}
 }
 
 + Nil {

@@ -34,15 +34,49 @@ Vector[float] : FloatArray {
     ^ this.dot(other);
   }
 
+  orthogonalTo {
+    arg other;
+    ^ this.dot(other) === 0;
+  }
+
+  compatibleWith {
+    arg other;
+    ^ (this.size === other.size);
+  }
+
+  notCompatibleWith {
+    arg other;
+    ^ this.compatibleWith(other).not();
+  }
+
   dot {
     arg other;
     var sum = 0;
+
+    if (this.notCompatibleWith(other)) {
+      Exception("%s are not the same size (% and %)".format(this.class, this.size, other.size));
+    };
+
     this.do {
       arg element, i;
       var otherElement = other[i];
       sum = sum + (element * otherElement);
     };
     ^ sum;
+  }
+
+  crossable {
+    arg other;
+    ^ (this.size === 3 and: {other.size === 3});
+  }
+
+  cross {
+    arg other;
+    var v = Vector(3);
+    v[0] = (this[1] * other[2]) - (this[2] * other[3]);
+    v[1] = (this[2] * other[0]) - (this[0] * other[2]);
+    v[2] = (this[0] * other[1]) - (this[1] * other[0]);
+    ^ v;
   }
 
   * {
