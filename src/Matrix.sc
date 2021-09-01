@@ -262,7 +262,6 @@ Matrix[slot] : Array {
 	hadamard {
 		arg other;
 		^ (this.asArray * other.asArray).asMatrix;
-		// ^ super.perform('*', other);
 	}
 
 	vectorProduct {
@@ -326,6 +325,44 @@ Matrix[slot] : Array {
 		^ m;
 	}
 
+	pr_gaussianFactor {
+		arg sourceRow, targetRow, columnIndex;
+		^ targetRow[columnIndex] / sourceRow[columnIndex]
+	}
+
+	lu {
+		var l = Matrix.identity(this.columnSize);
+		var u = this.deepCopy();
+		(1..(u.rowSize() - 1)).do {
+			arg targetRowId;
+			var targetRow = u.row(targetRowId);
+			(0..(targetRowId - 1)).do {
+				arg sourceRowId;
+				var sourceRow = u.row(sourceRowId);
+				var factor = this.pr_gaussianFactor(sourceRow, targetRow, sourceRowId);
+				l[sourceRowId][targetRowId] = factor;
+				targetRow = targetRow - (sourceRow * factor);
+			};
+			u.putRow(targetRowId, targetRow);
+		};
+		^ [l, u];
+	}
+
+	pivot {
+		// @TODO
+		// var pivots = Matrix.identity(this.columnSize);
+		// var m = this.deepCopy();
+		// m.rowSize.do {
+		// 	arg i;
+		// 	var sourceRow =
+		// };
+	}
+
+	pr_checkPivot {
+		arg row, rowIndex;
+		return (row[rowIndex] != 0);
+	}
+
 	/**
 	 * Perform a gaussian reduction on a matrix.
 	 */
@@ -381,7 +418,7 @@ Matrix[slot] : Array {
 	}
 
 	/**
-	 * Reduce each row at pivots.
+	 * Reduce each row at diagonal.
 	 */
 	reduceAtDiagonal {
 		var m = this.deepCopy();
@@ -427,21 +464,6 @@ Matrix[slot] : Array {
 
 	minors {
 
-	}
-
-	/**
-	 * Return the pivots from a reduced echelon matrix.
-	 * @TODO this is wrong, I think
-	 */
-	pivots {
-		var pivots = List[];
-		this.do {
-			arg vector, i;
-			if (vector[i] == 1) {
-				pivots.add(i);
-			};
-		}
-		^ pivots;
 	}
 
 	// NORM OPERATIONS

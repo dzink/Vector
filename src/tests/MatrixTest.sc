@@ -187,31 +187,32 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals((m.inverse * m).class, Matrix, "Inverse returns a Matrix");
 		this.assertEquals((m.inverse * m), Matrix.identity(3), "Inverse creates a proper inverse");
 	}
-	//
-	// test_mapping {
-	// 	var m1 = Matrix[[-1], [0], [1]];
-	// 	var m2 = Matrix[[-3, 0, 2]];
-	// 	var t = Matrix.scalar(3, -1);
-	// 	t.print;
-	// 	m1.product(t).print;
-	// 	// t.product(m1 + m2).postln;
-	// 	// t.product(m1) + t.product(m2).postln;
-	// }
 
-	// A benchmark for solving algorithms.
-	// test_bench {
-	// 	var n = 0;
-	// 	var v = Vector[-1, 1, 2];
-	// 	m = Matrix[[1, 2, 1], [3, 2, 6], [5, -1, 2]];
-	// 	m = m.augment(v);
-	// 	m.print;
-	// 	{n.do {
-	// 		m.reducedRowEchelon.pr_backsolve.postln;
-	// 	}}.bench;
-	// 	{n.do {
-	// 		m.diagonal.reduceAtDiagonal.last.postln;
-	// 	}}.bench;
-	// }
+	test_decomposition {
+		var l, u;
+		m = Matrix[[2, 1, -6], [4, -4, -9], [-4, 3, 5]];
+		#l, u = m.lu;
+
+		this.assertEquals(l, Matrix[ Vector[ 1.0, 0.5, -3.0 ], Vector[ 0.0, 1.0, -0.5 ], Vector[ 0.0, 0.0, 1.0 ] ], "L is correctly decomposed.");
+		this.assertEquals(u, Matrix[ Vector[ 2.0, 0.0, 0.0 ], Vector[ 4.0, -6.0, 0.0 ], Vector[ -4.0, 5.0, -4.5 ] ], "U is correctly decomposed.");
+		this.assertEquals(l * u, m, "LU equals m.");
+	}
+
+	test_pivot {
+		// @TODO
+		// var l, u;
+		// // m = Matrix[[0, 1, 0], [0, 0, -9], [-4, 0, 0]];
+		// m = Matrix.rows([2, 1, 1, 0],
+    //           [4, 3, 3, 1],
+    //           [8, 7, 9, 5],
+    //           [6, 7, 9, 8]);
+		// #l, u = m.lu;
+		//
+		// l.print;
+		// u.print;
+		// (l * u).print;
+
+	}
 
 
 }
