@@ -126,6 +126,12 @@ Vector[float] : FloatArray {
     ^ abs[abs.maxIndex];
   }
 
+  normalize {
+    arg type = \l2;
+    var norm = this.perform(type);
+    ^ this / norm;
+  }
+
   /**
    * Calculates the cos angle difference between 2 vectors.
    */

@@ -64,5 +64,17 @@ VectorTest : VectorAbstractTest {
 		this.assert(v.transposition.isKindOf(Matrix), "Vector transposition returns a type Matrix.");
 	}
 
+	test_normalize {
+		var v2 = Vector[-4, 3, 2];
+		v = Vector[3, 4, 0];
+		this.assertEquals(v.normalize(\l1), Vector[0.4285714328289, 0.57142859697342, 0], "l1 normalization works.");
+		this.assertEquals(v.normalize, Vector[0.6, 0.8, 0], "l2 normalization works.");
+		this.assertEquals(v.normalize(\maxNorm), Vector[0.75, 1.0, 0], "max normalization works.");
+		this.assertFloatEquals(v.normalize.l2, 1, "The norm of a normalized is 1.");
+		this.assertFloatEquals(v.normalize.dot(v2.normalize), 0, "The dot product of two orthogonal normalized vectors is 0.");
+		this.assertFloatEquals(v.normalize.selfDot(), 1, "The self dot product of a normalized vectors is 1.");
+		this.assertFloatEquals(v2.normalize.selfDot(), 1, "The self dot product of a normalized vectors is 1.");
+	}
+
 
 }
