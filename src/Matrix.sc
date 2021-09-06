@@ -622,6 +622,10 @@ Matrix[slot] : Array {
 		^ a;
 	}
 
+	squared {
+		^ this * this;
+	}
+
 	/**
 	 * An override to ensure that binary operations return a matrix and not an Array.
 	 * Make sure to use dot products on multiplication of vectors and matrices.

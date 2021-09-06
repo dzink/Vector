@@ -252,8 +252,8 @@ MatrixTest : VectorAbstractTest {
 		// l.print;
 		// u.print;
 		// i.print;
-		(l * u).print;
-		(m * i).print;
+		// (l * u).print;
+		// (m * i).print;
 	}
 
 	test_regression {
