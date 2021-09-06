@@ -24,11 +24,22 @@ MatrixTest : VectorAbstractTest {
 	}
 
 	test_rowsColumns {
-		m = Matrix.rows([1, 2, 3], [4, 5, 6], [7, 8, 9]);
+		m = Matrix.rows(Vector[1, 2, 3], [4, 5, 6], [7, 8, 9]);
 		this.assertEquals(m, Matrix[Vector[ 1.0, 4.0, 7.0 ], Vector[ 2.0, 5.0, 8.0 ], Vector[ 3.0, 6.0, 9.0 ]], "Creating matrix by rows works.");
 
 		m = Matrix.columns([1, 4, 7], [2, 5, 8], [3, 6, 9]);
 		this.assertEquals(m, Matrix[Vector[ 1.0, 4.0, 7.0 ], Vector[ 2.0, 5.0, 8.0 ], Vector[ 3.0, 6.0, 9.0 ]], "Creating matrix by columns works.");
+	}
+
+	test_sort {
+		m = Matrix[[0, 2, 3, 5], [1, 4, 2, 6], [-1, 5, 9, -2]];
+
+		this.assertEquals(m.sortColumnsBy(0)[0], Vector[-1, 5, 9, -2], "Sort by first element.");
+		this.assertEquals(m.sortColumnsBy(1)[1], Vector[1, 4, 2, 6], "Sort by second element.");
+
+		m = Matrix[[0, 3, 6, 9], [1, -5, 7, -10], [-1, 2, 5, 4]];
+		this.assertEquals(m.sortRowsBy(2)[2], Vector[-1, 2, 4, 5], "Sort rows by third element.");
+		this.assertEquals(m.sortRowsBy(2)[1], Vector[1, -5, -10, 7], "Second column is sorted by the third column's order.");
 	}
 
 	test_identity {
@@ -163,6 +174,10 @@ MatrixTest : VectorAbstractTest {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
 		};
+
+		m = Matrix.rows([0, 1, 0], [1, 0, 0], [0, 0, 1]);
+		v = Vector[1, 1, 1];
+		solution = m.solve(v).postln;
 	}
 
 	test_norm {
@@ -200,18 +215,39 @@ MatrixTest : VectorAbstractTest {
 
 	test_pivot {
 		// @TODO
-		// var l, u;
-		// // m = Matrix[[0, 1, 0], [0, 0, -9], [-4, 0, 0]];
-		// m = Matrix.rows([2, 1, 1, 0],
-    //           [4, 3, 3, 1],
-    //           [8, 7, 9, 5],
-    //           [6, 7, 9, 8]);
+		var l, u;
+		var i = Matrix.identity(3);
+		m = Matrix.rows([0, 1, 0], [0, 0, -9], [-4, 0, 0]);
+		// m.lu.postln;
+		// m.postln;
+		// m = m.addRow(2, 0);
+		// m = m.addRow(0, 1);
+		// m = m.addRow(1, 2);
+		// m.swapRow(2, 0);
+		// m.swapRow(2, 1);
+		//
+		// i.swapRow(2, 0);
+		// i.swapRow(2, 1);
+		//
+		// m.print;
+		// i.print;
+		// (m * i.inverse).print;
+		// m.lu.postln;
+		m = Matrix.rows([1, 5, 0, 0],
+              [2, 0, 0, 1],
+              [0, 3, 9, 5],
+              [6, 7, 9, 8]);
 		// #l, u = m.lu;
 		//
 		// l.print;
 		// u.print;
 		// (l * u).print;
-
+		# l, u, i = m.pivot;
+		// l.print;
+		// u.print;
+		// i.print;
+		(l * u).print;
+		(m * i).print;
 	}
 
 

@@ -190,6 +190,33 @@ Matrix[slot] : Array {
 	}
 
 	/**
+	 * Sorting.
+	 */
+
+	 /**
+	  * Sort all columns, based on their nth element.
+		*/
+	 sortColumnsBy {
+		 arg elementId = 0;
+		 ^ this.sort({
+			 arg a, b;
+			 a[elementId] < b[elementId];
+		 }).asMatrix();
+	 }
+
+	 /**
+	  * Sort all rows, based on their nth element.
+		*/
+	 sortRowsBy {
+		 arg elementId;
+		 var rows = this.rows.sort({
+			 arg a, b;
+			 a[elementId] < b[elementId];
+		 });
+		 ^ rows.asMatrix.transposition;
+	 }
+
+	/**
 	 * Transpose a matrix onto its side and return a new matrix.
 	 */
 	transposition {
