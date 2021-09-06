@@ -479,12 +479,19 @@ Matrix[slot] : Array {
 	 */
 	solve {
 		arg solutionVector;
-		var reduced = this.augment(solutionVector).reducedRowEchelon();
+		var reduced;
+		if (solutionVector.isNil) {
+			Exception("% requires a vector to solve for.".format(this.class)).throw();
+		};
+		reduced = this.augment(solutionVector).reducedRowEchelon();
+
+		// @TODO check for viable solutions
 		^ reduced.pr_backsolve();
 	}
 
 	pr_backsolve{
 		var solutions = Vector.fill(this.columnSize - 1, 0);
+
 		// Address the reduced rowSize in reverse order like you learned in Linear algebra.
 		((this.rowSize - 1)..0).do {
 			arg rowIndex;

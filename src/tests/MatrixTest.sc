@@ -175,6 +175,15 @@ MatrixTest : VectorAbstractTest {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
 		};
+
+		this.assertException({m.solve*()}, Exception, "Throws an error when no solution vector is present.");
+
+		// @TODO weird solutions around zero vector
+		// solution = m.solve(Vector[0, 0, 0]).postln;
+		// (m.transpose).do {
+		// 	arg vector, i;
+		// 	this.assertFloatEquals(vector.dot(solution), v[i]);
+		// };
 	}
 
 	test_norm {
