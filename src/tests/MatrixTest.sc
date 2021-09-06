@@ -277,5 +277,15 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m.determinant, -776, "4x4 determinant is correctly calculated.");
 	}
 
+	test_eigenvalue {
+		var m1 = Matrix[[3, 0], [1, 2]];
+		var i = m1.identity(2);
+
+		this.assert(m1.isEigenvalue(2), "Eigenvalue is confirmed.");
+		this.assert(m1.isEigenvalue(3), "Other eigenvalue is confirmed.");
+		this.assert(m1.isEigenvalue(4).not, "False eigenvalue is not confirmed.");
+
+	}
+
 
 }

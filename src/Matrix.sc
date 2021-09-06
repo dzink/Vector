@@ -591,6 +591,12 @@ Matrix[slot] : Array {
 		// // variables.postln;
 	}
 
+	isEigenvalue {
+		arg n;
+		var lambdaI = Matrix.scalar(this.columnSize, n);
+		^ (this - lambdaI).determinant == 0;
+	}
+
 	print {
 		this.rowSize.do {
 			arg i;
