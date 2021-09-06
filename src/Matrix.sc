@@ -250,15 +250,23 @@ Matrix[slot] : Array {
 	 * Convenience methods to create the right kinds of identities based on the current matrix.
 	 */
 	identity {
-		^ this.rightIdentity();
+		arg scalar = 1;
+		^ this.rightIdentity(scalar);
 	}
 
 	leftIdentity {
-		^ Matrix.identity(this.rowSize);
+		arg scalar = 1;
+		^ Matrix.scalar(this.rowSize, scalar);
 	}
 
 	rightIdentity {
-		^ Matrix.identity(this.columnSize);
+		arg scalar = 1;
+		^ Matrix.identity(this.columnSize, scalar);
+	}
+
+	rotation {
+		arg ... radians;
+		// @TODO
 	}
 
 	/**
