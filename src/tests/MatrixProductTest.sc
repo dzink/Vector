@@ -26,4 +26,10 @@ MatrixProductTest : MatrixTest {
 		this.assertEquals(m * m2, Matrix[ Vector[ 5.0, -1.0 ], Vector[ 2.0, 1.0 ], Vector[ 0.0, -2.0 ], Vector[ 6.0, 4.0 ] ], "Matrix product is accurately calculated with shorthand.");
 		this.assertException({m * Matrix.rows([0, 2, 3, 5], [1, -1, 2, 7])}, Exception, "Accurately throws an exception when attempting to dot multiply incompatible matrix.");
 	}
+
+	test_hadamard {
+		var m2 = Matrix[[1, 2], [3, 1]];
+		m = Matrix[[0, 1], [2, 4.1]];
+		this.assertEquals(m.hadamard(m2), Matrix[[0, 2], [6, 4.1]], "Hadamard product is accurately calculated.");
+	}
 }

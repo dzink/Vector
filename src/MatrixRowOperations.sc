@@ -35,4 +35,23 @@ MatrixRowOperations {
 		};
 		^ m;
 	}
+
+	*augment {
+		arg m, other;
+		other = other.asMatrix.deepCopy();
+		if (m.columnSize + other.columnSize > m.maxSize) {
+			m.grow(other.columnSize);
+		};
+		m = m.addAll(*other);
+		^ m;
+	}
+
+	findPivot {
+		arg m, rowId, minimum = 0;
+		
+	}
+
+	*reduceRowAtPivot {
+		arg m, row;
+	}
 }

@@ -45,4 +45,12 @@ MatrixProduct {
 			(m[index] * scalar);
 		}.sum;
 	}
+
+	/**
+	 * This is how SC will try to multiply arrays, sometimes you want this. Each cell is multiplied by the same cell in other, and a new matrix is returned.
+	 */
+	*hadamard {
+		arg m, other;
+		^ (m.asArray * other.asArray).asMatrix;
+	}
 }

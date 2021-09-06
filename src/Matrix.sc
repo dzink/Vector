@@ -210,16 +210,7 @@ Matrix[slot] : Array {
 	augment {
 		arg other;
 		var m = this.deepCopy();
-		^ m.pr_augment(other);
-	}
-
-	pr_augment {
-		arg other;
-		other = other.asMatrix.deepCopy();
-		if (this.columnSize + other.columnSize > this.maxSize) {
-			this.grow(other.columnSize);
-		};
-		^ this.addAll(*other);
+		^ MatrixRowOperations.augment(m, other);
 	}
 
 	/**
@@ -257,7 +248,7 @@ Matrix[slot] : Array {
 	 */
 	hadamard {
 		arg other;
-		^ (this.asArray * other.asArray).asMatrix;
+		^ MatrixProduct.hadamard(this, other);
 	}
 
 	vectorProduct {
@@ -293,9 +284,7 @@ Matrix[slot] : Array {
 
 	inverse {
 		var m = this.deepCopy();
-		m = m.augment(Matrix.identity(m.rowSize));
-		m = m.pr_diagonal().pr_reduceAtDiagonal().chop(m.rowSize, inf);
-		^ m;
+		^ MatrixSolver.inverse(m);
 	}
 
 	pr_gaussianFactor {
@@ -321,38 +310,12 @@ Matrix[slot] : Array {
 		^ [l, u];
 	}
 
-	pivot {
-		// @TODO
-		// var pivots = Matrix.identity(this.columnSize);
-		// var m = this.deepCopy();
-		// m.rowSize.do {
-		// 	arg i;
-		// 	var sourceRow =
-		// };
-	}
-
-	pr_checkPivot {
-		arg row, rowIndex;
-		return (row[rowIndex] != 0);
-	}
-
 	/**
 	 * Perform a gaussian reduction on a matrix.
 	 */
 	upperRowEchelon {
 		var result = this.deepCopy();
-		^ result.pr_upperRowEchelon();
-	}
-
-	pr_upperRowEchelon {
-		(0..(this.rowSize - 2)).do {
-			arg sourceIndex;
-			((sourceIndex + 1)..(this.rowSize - 1)).do {
-				arg rowIndex;
-				this.pr_calculateRowEchelonRow(sourceIndex, rowIndex, sourceIndex);
-			}
-		};
-		^ this;
+		^ MatrixSolver.upperRowEchelon(result);
 	}
 
 	rowEchelon {
@@ -361,33 +324,12 @@ Matrix[slot] : Array {
 
 	lowerRowEchelon {
 		var result = this.deepCopy();
-		^ result.pr_lowerRowEchelon();
-	}
-
-	pr_lowerRowEchelon {
-		((this.rowSize - 1)..1).do {
-			arg sourceIndex;
-			((sourceIndex - 1)..0).do {
-				arg rowIndex;
-				this.pr_calculateRowEchelonRow(sourceIndex, rowIndex, sourceIndex);
-			}
-		};
-		^ this;
+		^ MatrixSolver.lowerRowEchelon(result);
 	}
 
 	diagonal {
-		var m = this.deepCopy();
-		^ m.pr_diagonal();
-	}
-
-	pr_diagonal {
-		^ this.pr_upperRowEchelon().pr_lowerRowEchelon();
-	}
-
-	pr_calculateRowEchelonRow {
-		arg sourceIndex, rowIndex, leftIndex;
-		var diff = this[leftIndex][rowIndex] / this[leftIndex][sourceIndex];
-		this.addRow(sourceIndex, rowIndex, diff.neg);
+		var result = this.deepCopy();
+		^ MatrixSolver.diagonal(result);
 	}
 
 	/**
