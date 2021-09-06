@@ -1,3 +1,6 @@
+/**
+ * Creates and operates on a matrix.
+ */
 Matrix[slot] : Array {
 	var <> vectorSize;
 
@@ -143,50 +146,23 @@ Matrix[slot] : Array {
 		};
 	}
 
-	/**
-	 * Swap two given rows in place.
-	 */
 	swapRow {
 		arg rowId1, rowId2;
-		var row1 = this.row(rowId1);
-		var row2 = this.row(rowId2);
-		this.putRow(rowId2, row1);
-		this.putRow(rowId1, row2);
-		^ this;
+		^ MatrixRowOperations.swap(this, rowId1, rowId2);
 	}
 
-	/**
-	 * Scale a given row in place.
-	 */
 	scaleRow {
 		arg rowId, scalar = 1;
-		var vector = this.row(rowId);
-		vector = vector * scalar;
-		this.putRow(rowId, vector);
-		^ this;
+		^ MatrixRowOperations.scale(this, rowId, scalar);
 	}
 
-	/**
-	 * Add a scaled row to another row in place.
-	 */
 	addRow {
 		arg sourceRowId, targetRowId, scalar = 1;
-		var source = this.row(sourceRowId);
-		var target = this.row(targetRowId);
-		source = source * scalar;
-		target = target + source;
-		this.putRow(targetRowId, target);
-		^ this;
+		^ MatrixRowOperations.add(this, sourceRowId, targetRowId, scalar);
 	}
 
 	reverseRows {
-		var m = this.deepCopy();
-		var rowSize = m.rowSize();
-		rowSize.do {
-			arg i;
-			m.putRow(i, this.row(rowSize - 1 - i));
-		};
-		^ m;
+		^ MatrixRowOperations.reverseOrder(this);
 	}
 
 	/**
