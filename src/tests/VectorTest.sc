@@ -76,5 +76,12 @@ VectorTest : VectorAbstractTest {
 		this.assertFloatEquals(v2.normalize.selfDot(), 1, "The self dot product of a normalized vectors is 1.");
 	}
 
+	test_mean {
+		v = Vector[1, 4, -3, 6];
+		this.assertFloatEquals(v.mean, 2, "Mean of a vector is corresctly calculated.");
+		this.assertFloatEquals(v.standardDeviation.standardDeviation, 3.39116, "Standard deviation of a vector is corresctly calculated.");
+		this.assertFloatEquals(v.standardDeviation.confidence, 1.6955824957813, "Standard deviation confidence of a vector is corresctly calculated.");
+	}
+
 
 }

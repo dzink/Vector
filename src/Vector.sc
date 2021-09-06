@@ -194,4 +194,19 @@ Vector[float] : FloatArray {
   transposition {
     ^ this.asMatrix.transposition;
   }
+
+  pivotIndex {
+    this.do {
+      arg element, i;
+      if (element != 0) {
+        ^ i;
+      };
+    };
+    ^ nil;
+  }
+
+  standardDeviation {
+    ^ StandardDeviation.fromArray(this);
+  }
+
 }
