@@ -16,6 +16,13 @@ Vector[float] : FloatArray {
     ^ this;
   }
 
+  dropElement {
+    arg elementId;
+    var v = this.copy;
+    v.removeAt(elementId);
+    ^ v;
+  }
+
   //
   // clear {
   //   for (0, this.maxSize, {

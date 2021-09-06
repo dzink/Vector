@@ -9,7 +9,8 @@ MatrixTest : VectorAbstractTest {
 		m.free;
 	}
 
-	test_newClear {
+	test_new {
+		m = Matrix.new();
 		m = Matrix.newClear(2, 3);
 		this.assertEquals(m.columnSize, 2, "Clear Matrix is the right column size.");
 		this.assertEquals(m.rowSize, 3, "Clear Matrix is the right rows size.");
@@ -174,10 +175,6 @@ MatrixTest : VectorAbstractTest {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
 		};
-
-		m = Matrix.rows([0, 1, 0], [1, 0, 0], [0, 0, 1]);
-		v = Vector[1, 1, 1];
-		solution = m.solve(v).postln;
 	}
 
 	test_norm {
@@ -248,6 +245,27 @@ MatrixTest : VectorAbstractTest {
 		// i.print;
 		(l * u).print;
 		(m * i).print;
+	}
+
+	test_regression {
+		var sums;
+		m = Matrix[[140, 60, 22], [155, 62, 25], [159, 67, 24], [179, 70, 20], [192, 71, 15], [200, 72, 14], [212, 75, 14], [215, 78, 11]];
+		// sums = m.sum;
+		// sums.postln;
+		// m.print;
+		// m.regression(0, [1, 2]).postln;
+	}
+
+	test_determinant {
+		m = Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+		this.assertEquals(m.pr_dropColumnAndRow(1, 1), Matrix[[1, 3], [7, 9]], "Rows and Columns are properly dropped.");
+		this.assertEquals(m, Matrix[[1, 2, 3], [4, 5, 6], [7, 8, 9]], "Original matrix is not affected when rows and columns are dropped.");
+
+		m = Matrix[[6, 4, 2], [1, -2, 8], [1, 5, 7]];
+		this.assertEquals(m.determinant, -306, "3x3 determinant is correctly calculated.");
+
+		m = Matrix[[1, 2, 6, 3], [2, 3, 4, 5], [3, 4, 3, -2], [4, -5, 6, 1]];
+		this.assertEquals(m.determinant, -776, "4x4 determinant is correctly calculated.");
 	}
 
 

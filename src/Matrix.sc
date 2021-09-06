@@ -526,6 +526,56 @@ Matrix[slot] : Array {
 		^ max
 	}
 
+	determinant {
+		if (this.size == 2) {
+			^ (this[0][0] * this[1][1]) - (this[0][1] * this[1][0]);
+		} {
+			var total = 0;
+			var evenOdd = 1;
+			this.do {
+				arg vector, i;
+				var subDeterminant = this.pr_dropColumnAndRow(i, 0).determinant;
+				subDeterminant = subDeterminant * vector[0] * evenOdd;
+				total = total + subDeterminant;
+				evenOdd = evenOdd * -1;
+			};
+			^ total;
+		};
+
+	}
+
+	pr_dropColumnAndRow {
+		arg columnId, rowId;
+		var m = Matrix.new();
+		if (columnId > 0) {
+			m = m ++ this[0..(columnId - 1)];
+		};
+		if (columnId < (this.size - 1)) {
+			m = m ++ this[(columnId + 1)..(this.size - 1)];
+		};
+		m = m.deepCopy();
+		^ m.collect {
+			arg vector;
+			vector.dropElement(rowId);
+		}.asMatrix;
+	}
+
+	regression {
+		// @TODO
+		// arg dependentElementId = 0, independentElementId = 1;
+		// var variables = Vector[dependentElementId] ++ independentElementId.asVector;
+		// var rows = this.rows.at(variables);
+		// var independentRows = rows[1..(rows.size - 1)];
+		// var dependentSum = rows[0].sum;
+		// var independentSums = independentRows.collect({
+		// 	arg row;
+		// 	row.sum;
+		// }).postln;
+		//
+		// ^ rows;
+		// // variables.postln;
+	}
+
 	print {
 		this.rowSize.do {
 			arg i;
