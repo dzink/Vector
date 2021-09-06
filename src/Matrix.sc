@@ -249,22 +249,7 @@ Matrix[slot] : Array {
 	 * @TODO it would be nice to have a way to "check" a matrix but I'm not sure what that would look like at this time.
 	 */
 	checkVectors {
-		var size = nil;
-		this.do {
-			arg vector;
-			if (vector.notNil) {
-				if (vector.isKindOf(Vector).not) {
-					// @TODO throw error here.
-				};
-			};
-			if (vector.size != size) {
-				if (size.notNil) {
-					// @TODO throw error here.
-				};
-				size = vector.size;
-			};
-		};
-		^ this;
+
 	}
 
 	/**
@@ -277,45 +262,22 @@ Matrix[slot] : Array {
 
 	vectorProduct {
 		arg other;
-
-		if (this.notCompatibleWith(other)) {
-			Exception("% * % product requires equal column (%) and vector (%) sizes.".format(this.class, other.class, this.columnSize, other.size)).throw();
-		};
-
-		^ other.collect {
-			arg scalar, index;
-			(this[index] * scalar);
-		}.sum;
+		^ MatrixProduct.matrixVectorProduct(this, other);
 	}
 
-	compatibleWith {
+	isCompatible {
 		arg other;
-		if (other.isKindOf(Matrix)) {
-			^ (this.columnSize() === other.rowSize());
-		};
-		if (other.isKindOf(Vector)) {
-			^ (this.columnSize() === other.size());
-		};
-		^ true;
+		^ MatrixProduct.areCompatible(this, other);
 	}
 
-	notCompatibleWith {
+	notCompatible {
 		arg other;
-		^ this.compatibleWith(other).not();
+		^ this.isCompatible(other).not();
 	}
 
 	matrixProduct {
 		arg other;
-		var result;
-
-		if (this.notCompatibleWith(other)) {
-			Exception("% * % product requires equal column (%) and row (%) sizes.".format(this.class, other.class, this.columnSize.cs, other.rowSize.cs)).throw();
-		};
-
-		^ other.collect {
-			arg otherVector;
-			this.vectorProduct(otherVector);
-		}.asMatrix();
+		^ MatrixProduct.matrixMatrixProduct(this, other);
 	}
 
 	product {
