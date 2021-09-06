@@ -83,5 +83,21 @@ VectorTest : VectorAbstractTest {
 		this.assertFloatEquals(v.standardDeviation.confidence, 1.6955824957813, "Standard deviation confidence of a vector is corresctly calculated.");
 	}
 
+	test_orthogonalTo {
+		var v1 = Vector[2, 3, 4];
+		var v2 = Vector[-3, 2, 0];
+
+		this.assert(v1.orthogonalTo(v2), "V1 is orthogonal to orthogonal v2.");
+		this.assert(v1.parallelTo(v2).not, "V1 is not parallel to orthogonal v2.");
+
+		v2 = Vector[-3, -4.5, -6];
+		this.assert(v1.orthogonalTo(v2).not, "V1 is not orthogonal to parallel v2.");
+		this.assert(v1.parallelTo(v2), "V1 is parallel to parallel v2.");
+
+		v2 = Vector[-3, -1.5, 4];
+		this.assert(v1.orthogonalTo(v2).not, "V1 is not orthogonal to random v2.");
+		this.assert(v1.parallelTo(v2).not, "V1 is parallel to random v2.");
+	}
+
 
 }

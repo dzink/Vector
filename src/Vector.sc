@@ -43,7 +43,21 @@ Vector[float] : FloatArray {
 
   orthogonalTo {
     arg other;
-    ^ this.dot(other) === 0;
+    ^ this.dot(other) == 0;
+  }
+
+  parallelTo {
+    arg other;
+    var ratio = this / other;
+    var base = ratio[0];
+    ratio.do {
+      arg n;
+      if (n != base) {
+        ^ false;
+      };
+    };
+    ^ true;
+    // ratio.postln;
   }
 
   compatibleWith {
