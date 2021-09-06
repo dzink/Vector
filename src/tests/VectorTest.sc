@@ -58,10 +58,10 @@ VectorTest : VectorAbstractTest {
 		this.assert(v.isKindOf(Vector), "Adding maintains vectorness");
 	}
 
-	test_transposition {
+	test_transpose {
 		v = Vector[1, 2, 3];
-		this.assertEquals(v.transposition, Matrix[[1], [2], [3]], "Vector transposition returns a 1 - 2 - 3 Matrix.");
-		this.assert(v.transposition.isKindOf(Matrix), "Vector transposition returns a type Matrix.");
+		this.assertEquals(v.transpose, Matrix[[1], [2], [3]], "Vector transpose returns a 1 - 2 - 3 Matrix.");
+		this.assert(v.transpose.isKindOf(Matrix), "Vector transpose returns a type Matrix.");
 	}
 
 	test_normalize {

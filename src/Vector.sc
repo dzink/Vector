@@ -191,8 +191,8 @@ Vector[float] : FloatArray {
     ^ Matrix[this];
   }
 
-  transposition {
-    ^ this.asMatrix.transposition;
+  transpose {
+    ^ this.asMatrix.transpose;
   }
 
   pivotIndex {

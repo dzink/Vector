@@ -73,13 +73,13 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m , Matrix[[3, 3], [-2, 6]], "Matrices are added.");
 	}
 
-	test_transposition {
+	test_transpose {
 		m = Matrix[[3, 1], [-3, 2]];
-		this.assert(m.transposition.isKindOf(Matrix), "Transposition maintains matrix.");
-		this.assertEquals(m.transposition(), Matrix[[3, -3], [1, 2]], "Transposition is successful.");
+		this.assert(m.transpose.isKindOf(Matrix), "transpose maintains matrix.");
+		this.assertEquals(m.transpose(), Matrix[[3, -3], [1, 2]], "transpose is successful.");
 
 		m = Matrix[[1, 2, 3], [4, 5, 6]];
-		this.assertEquals(m.transposition(), Matrix[[1, 4], [2, 5], [3, 6]], "Rectangular matrices are transposed also.");
+		this.assertEquals(m.transpose(), Matrix[[1, 4], [2, 5], [3, 6]], "Rectangular matrices are transposed also.");
 	}
 
 	test_vectorRow {
@@ -171,7 +171,7 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m.augment(v).reducedRowEchelon, Matrix[Vector[1.0, -0.0, -0.0], Vector[3.0, 1.0, -0.0], Vector[5.0, 2.75, 1.0], Vector[-1.0, -0.75, -0.46666666865349]], "Matrix is reduced row echelon format properly.");
 
 		solution = m.solve(v);
-		(m.transposition).do {
+		(m.transpose).do {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);
 		};

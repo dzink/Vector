@@ -213,13 +213,13 @@ Matrix[slot] : Array {
 			 arg a, b;
 			 a[elementId] < b[elementId];
 		 });
-		 ^ rows.asMatrix.transposition;
+		 ^ rows.asMatrix.transpose;
 	 }
 
 	/**
 	 * Transpose a matrix onto its side and return a new matrix.
 	 */
-	transposition {
+	transpose {
 		var new = Matrix(this.rowSize());
 		this.rowSize.do {
 			arg vector, rowIndex;
