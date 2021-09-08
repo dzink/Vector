@@ -269,9 +269,10 @@ Matrix[slot] : Array {
 		^ super.perform('*', other);
 	}
 
+	// Solver
+
 	inverse {
-		var m = this.deepCopy();
-		^ MatrixSolver.inverse(m);
+		^ MatrixSolver.inverse(this.deepCopy());
 	}
 
 	pr_gaussianFactor {
@@ -280,29 +281,14 @@ Matrix[slot] : Array {
 	}
 
 	lu {
-		var l = Matrix.identity(this.columnSize);
-		var u = this.deepCopy();
-		(1..(u.rowSize() - 1)).do {
-			arg targetRowId;
-			var targetRow = u.row(targetRowId);
-			(0..(targetRowId - 1)).do {
-				arg sourceRowId;
-				var sourceRow = u.row(sourceRowId);
-				var factor = this.pr_gaussianFactor(sourceRow, targetRow, sourceRowId);
-				l[sourceRowId][targetRowId] = factor;
-				targetRow = targetRow - (sourceRow * factor);
-			};
-			u.putRow(targetRowId, targetRow);
-		};
-		^ [l, u];
+		^ MatrixSolver.lu(this);
 	}
 
 	/**
 	 * Perform a gaussian reduction on a matrix.
 	 */
 	upperRowEchelon {
-		var result = this.deepCopy();
-		^ MatrixSolver.upperRowEchelon(result);
+		^ MatrixSolver.upperRowEchelon(this.deepCopy());
 	}
 
 	rowEchelon {
@@ -310,21 +296,18 @@ Matrix[slot] : Array {
 	}
 
 	lowerRowEchelon {
-		var result = this.deepCopy();
-		^ MatrixSolver.lowerRowEchelon(result);
+		^ MatrixSolver.lowerRowEchelon(this.deepCopy());
 	}
 
 	diagonal {
-		var result = this.deepCopy();
-		^ MatrixSolver.diagonal(result);
+		^ MatrixSolver.diagonal(this.deepCopy());
 	}
 
 	/**
 	 * Reduce each row at diagonal.
 	 */
 	reduceAtDiagonal {
-		var m = this.deepCopy();
-		^ m.pr_reduceAtDiagonal();
+		^ this.deepCopy().pr_reduceAtDiagonal();
 	}
 
 	pr_reduceAtDiagonal {
@@ -336,8 +319,7 @@ Matrix[slot] : Array {
 	}
 
 	reducedRowEchelon {
-		var m = this.deepCopy();
-		^ m.rowEchelon().pr_reduceAtDiagonal()
+		^ this.deepCopy().rowEchelon().pr_reduceAtDiagonal()
 	}
 
 	/**

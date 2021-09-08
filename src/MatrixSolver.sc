@@ -37,7 +37,7 @@ MatrixSolver {
 			((sourceIndex + 1)..(m.rowSize - 1)).do {
 				arg rowIndex;
 				this.pr_calculateRowEchelonRow(m, sourceIndex, rowIndex, sourceIndex);
-			}
+			};
 		};
 		^ m;
 	}
@@ -62,7 +62,6 @@ MatrixSolver {
 
 	*diagonal {
 		arg m;
-		m.print;
 		m = this.upperRowEchelon(m);
 		m = this.lowerRowEchelon(m);
 		^ m;
