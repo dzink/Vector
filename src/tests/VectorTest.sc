@@ -105,5 +105,11 @@ VectorTest : VectorAbstractTest {
 		this.assertEquals(a.outer(b), Matrix[Vector[ 5.0, 10.0, 15.0, 20.0 ], Vector[ 6.0, 12.0, 18.0, 24.0 ], Vector[ -1.0, -2.0, -3.0, -4.0 ]], "Outer Product is calculated.");
 	}
 
+	test_projectOnto {
+		var a = Vector[1, 2, 3];
+		var b = Vector[4, 3, 2];
+		this.assertEquals(b.projectOnto(a), Vector[ 0.28571426868439, 0.85714280605316, 1.2857143878937], "Vector projection is accurate.");
+	}
+
 
 }

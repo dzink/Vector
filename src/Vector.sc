@@ -174,6 +174,12 @@ Vector[float] : FloatArray {
     ^ this.copy.addSafe(1);
   }
 
+  projectOnto {
+    arg other;
+    var u = other.normalize();
+    ^ (u * this) * u;
+  }
+
   performBinaryOp {
     arg aSelector, theOperand, adverb;
     var result = super.performBinaryOp(aSelector, theOperand, adverb);
