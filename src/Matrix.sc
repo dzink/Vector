@@ -167,39 +167,28 @@ Matrix[slot] : Array {
 	 * Sorting.
 	 */
 
-	 /**
-	  * Sort all columns, based on their nth element.
-		*/
+	 sortColumnsByLength {
+		 arg algo = \l2;
+		 ^ MatrixReshape.sortColumnsByLength(this, algo);
+	 }
+
+	 sortRowsByLength {
+		 arg algo = \l2;
+		 ^ MatrixReshape.sortRowsByLength(this, algo);
+	 }
+
 	 sortColumnsBy {
 		 arg elementId = 0;
-		 ^ this.sort({
-			 arg a, b;
-			 a[elementId] < b[elementId];
-		 }).asMatrix();
+		 ^ MatrixReshape.sortColumnsBy(this, elementId);
 	 }
 
-	 /**
-	  * Sort all rows, based on their nth element.
-		*/
 	 sortRowsBy {
-		 arg elementId;
-		 var rows = this.rows.sort({
-			 arg a, b;
-			 a[elementId] < b[elementId];
-		 });
-		 ^ rows.asMatrix.transpose;
+		 arg elementId = 0;
+		 ^ MatrixReshape.sortRowsBy(this, elementId);
 	 }
 
-	/**
-	 * Transpose a matrix onto its side and return a new matrix.
-	 */
 	transpose {
-		var new = Matrix(this.rowSize());
-		this.rowSize.do {
-			arg vector, rowIndex;
-			new.add(this.row(rowIndex));
-		}
-		^ new;
+		^ MatrixReshape.transpose(this);
 	}
 
 	/**
@@ -208,7 +197,7 @@ Matrix[slot] : Array {
 	augment {
 		arg other;
 		var m = this.deepCopy();
-		^ MatrixRowOperations.augment(m, other);
+		^ MatrixReshape.augment(m, other);
 	}
 
 	/**

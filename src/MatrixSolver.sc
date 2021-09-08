@@ -70,7 +70,7 @@ MatrixSolver {
 
 	*inverse {
 		arg m;
-		m = MatrixRowOperations.augment(m, Matrix.identity(m.rowSize));
+		m = MatrixReshape.augment(m, Matrix.identity(m.rowSize));
 		m = MatrixSolver.diagonal(m).pr_reduceAtDiagonal().chop(m.rowSize, inf);
 		^ m;
 	}
