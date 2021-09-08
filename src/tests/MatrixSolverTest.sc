@@ -50,4 +50,17 @@ MatrixSolverTest : MatrixTest {
 		this.assertEquals(l * u, m, "LU equals m.");
 	}
 
+	test_gramSchmidt {
+		var gs;
+		m = Matrix[[1, 2, 6], [-1, 4, 3], [5, 3, 1]];
+		gs = m.gramSchmidt();
+		this.assertEquals(gs, Matrix[Vector[ 0.15617376565933, 0.31234753131866, 0.93704259395599 ], Vector[ -0.0091589074581861, 0.14654251933098, 0.9891619682312 ], Vector[ 0.0004277431871742, 0.065701350569725, 0.9978392124176 ]]);
+		(gs * gs.transpose).print;
+	}
+
+	test_powerIteration {
+		m = Matrix[[2.92, 0.86, -1.15], [0.86, 6.51, 3.32], [-1.15, 3.32, 4.57]];
+		this.assertEquals(m.powerIteration().round(0.001), Vector[0, 0.8, 0.6], "Power Iteration is computed correctly");
+	}
+
 }

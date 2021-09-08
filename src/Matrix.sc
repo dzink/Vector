@@ -353,6 +353,14 @@ Matrix[slot] : Array {
 		^ solutions;
 	}
 
+	powerIteration {
+		^ MatrixSolver.powerIteration(this);
+	}
+
+	gramSchmidt {
+		^ MatrixSolver.gramSchmidt(this.deepCopy);
+	}
+
 	minors {
 
 	}

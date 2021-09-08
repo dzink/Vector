@@ -74,5 +74,39 @@ MatrixSolver {
 		^ m;
 	}
 
+	*powerIteration {
+		arg m;
+		var v = Vector.fill(m.rowSize, 1);
+		loop {
+			var previous = v;
+			v = (m * v).normalize;
+			if (v == previous) {
+				^ v;
+			};
+		};
+	}
+
+	*gramSchmidt {
+		arg m;
+		var previous;
+		var maxColumnId = m.columnSize() - 1;
+		m[0] = m[0].normalize;
+		previous = m[0];
+		if (maxColumnId > 0) {
+			(1..maxColumnId).do {
+				arg i;
+				var v = m[i];
+				v = v.projectOnto(previous).normalize;
+				m[i] = previous = v;
+			};
+		};
+		^ m;
+	}
+
+	*qr {
+		arg m;
+		^ this.gramSchmidt(m);
+	}
+
 
 }

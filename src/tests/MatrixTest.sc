@@ -145,5 +145,4 @@ MatrixTest : VectorAbstractTest {
 
 	}
 
-
 }
