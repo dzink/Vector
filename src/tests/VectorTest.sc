@@ -99,5 +99,11 @@ VectorTest : VectorAbstractTest {
 		this.assert(v1.parallelTo(v2).not, "V1 is parallel to random v2.");
 	}
 
+	test_outer {
+		var a = Vector[1, 2, 3, 4];
+		var b = Vector[5, 6, -1];
+		this.assertEquals(a.outer(b), Matrix[Vector[ 5.0, 10.0, 15.0, 20.0 ], Vector[ 6.0, 12.0, 18.0, 24.0 ], Vector[ -1.0, -2.0, -3.0, -4.0 ]], "Outer Product is calculated.");
+	}
+
 
 }

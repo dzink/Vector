@@ -86,6 +86,13 @@ Vector[float] : FloatArray {
     ^ sum;
   }
 
+  outer {
+    arg other;
+    var a = Matrix[this];
+    var b = other.transpose;
+    ^ a * b;
+  }
+
   crossable {
     arg other;
     ^ (this.size === 3 and: {other.size === 3});
