@@ -2,12 +2,10 @@
  * Creates and operates on a matrix.
  */
 Matrix[slot] : Array {
-	var <> vectorSize;
 
 	*new {
-		arg size, vectorSize;
+		arg size;
 		var m = super.new(size);
-		m.vectorSize = vectorSize;
 		^ m;
 	}
 
