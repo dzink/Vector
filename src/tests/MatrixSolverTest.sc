@@ -17,6 +17,8 @@ MatrixSolverTest : MatrixTest {
 		this.assertEquals(m.augment(v).reducedRowEchelon, Matrix[Vector[1.0, -0.0, -0.0], Vector[3.0, 1.0, -0.0], Vector[5.0, 2.75, 1.0], Vector[-1.0, -0.75, -0.46666666865349]], "Matrix is reduced row echelon format properly.");
 
 		solution = m.solve(v);
+		this.assertEquals(m * solution, v, "The solution works!");
+
 		(m.transpose).do {
 			arg vector, i;
 			this.assertFloatEquals(vector.dot(solution), v[i]);

@@ -268,6 +268,9 @@ Matrix[slot] : Array {
 		^ MatrixProduct.matrixMatrixProduct(this, other);
 	}
 
+	/**
+	 * Figure out which kind of product to take based on the class of other.
+	 */
 	product {
 		arg other;
 		if (other.isKindOf(Vector)) {
