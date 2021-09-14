@@ -54,6 +54,16 @@ Matrix[slot] : Array {
 		^ m;
 	}
 
+	*diagonals {
+		arg ... diagonals;
+		var m = this.newClear(diagonals.size, diagonals.size);
+		diagonals.do {
+			arg d, i;
+			m[i][i] = d;
+		};
+		^ m;
+	}
+
 	// PUT operations
 
 	/**
