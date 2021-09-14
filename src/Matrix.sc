@@ -505,4 +505,16 @@ Matrix[slot] : Array {
 		^ this.class.newFrom(result);
 	}
 
+	printOn {
+		arg stream;
+		stream << this.class.asString;
+		super.printOn(stream);
+	}
+
+	storeOn {
+		arg stream;
+		stream << this.class.asString;
+		super.storeOn(stream);
+	}
+
 }
