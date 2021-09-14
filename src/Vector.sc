@@ -43,7 +43,7 @@ Vector[float] : FloatArray {
 
   orthogonalTo {
     arg other;
-    ^ this.dot(other) == 0;
+    ^ this.dot(other).equalWithPrecision(0.0);
   }
 
   parallelTo {
@@ -176,8 +176,12 @@ Vector[float] : FloatArray {
 
   projectOnto {
     arg other;
-    var u = other.normalize();
-    ^ (u * this) * u;
+    ^ (other.dot(this) / other.selfDot()) * other;
+  }
+
+  orthogonalProjectOnto {
+    arg other;
+    ^ this - this.projectOnto(other);
   }
 
   performBinaryOp {

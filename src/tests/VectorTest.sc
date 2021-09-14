@@ -106,9 +106,14 @@ VectorTest : VectorAbstractTest {
 	}
 
 	test_projectOnto {
-		var a = Vector[1, 2, 3];
-		var b = Vector[4, 3, 2];
-		this.assertEquals(b.projectOnto(a), Vector[ 0.28571426868439, 0.85714280605316, 1.2857143878937], "Vector projection is accurate.");
+		var a, b;
+		a = Vector[3, 5];
+		b = Vector[2, 4];
+
+		this.assertEquals(a.projectOnto(b), Vector[2.6, 5.2], "A projected onto b is correct.");
+		this.assert(a.projectOnto(b).parallelTo(b), "The projection of a onto b is parallel to b.");
+		this.assertEquals(a.orthogonalProjectOnto(b), Vector[0.40000009536743, -0.19999980926514], "A orthogonally projected onto b is correct.");
+		this.assert(a.orthogonalProjectOnto(b).orthogonalTo(b), "The projection of a onto b is parallel to b.");
 	}
 
 

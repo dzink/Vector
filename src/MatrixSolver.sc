@@ -86,6 +86,9 @@ MatrixSolver {
 		};
 	}
 
+	/**
+	 * Create a matrix orthonormal to m.
+	 */
 	*gramSchmidt {
 		arg m;
 		var previous;
@@ -96,7 +99,7 @@ MatrixSolver {
 			(1..maxColumnId).do {
 				arg i;
 				var v = m[i];
-				v = v.projectOnto(previous).normalize;
+				v = v.orthogonalProjectOnto(previous).normalize;
 				m[i] = previous = v;
 			};
 		};

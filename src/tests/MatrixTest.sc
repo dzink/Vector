@@ -32,6 +32,11 @@ MatrixTest : VectorAbstractTest {
 		this.assertEquals(m, Matrix[Vector[ 1.0, 4.0, 7.0 ], Vector[ 2.0, 5.0, 8.0 ], Vector[ 3.0, 6.0, 9.0 ]], "Creating matrix by columns works.");
 	}
 
+	test_diagonals {
+		m = Matrix.diagonals(2, 4, 7, 9);
+		this.assertEquals(m, Matrix[ Vector[ 2.0, 0.0, 0.0, 0.0 ], Vector[ 0.0, 4.0, 0.0, 0.0 ], Vector[ 0.0, 0.0, 7.0, 0.0 ], Vector[ 0.0, 0.0, 0.0, 9.0 ] ], "A diagonal matrix is properly generated.");
+	}
+
 	test_sort {
 		m = Matrix[[0, 2, 3, 5], [1, 4, 2, 6], [-1, 5, 9, -2]];
 

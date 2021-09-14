@@ -51,11 +51,23 @@ MatrixSolverTest : MatrixTest {
 	}
 
 	test_gramSchmidt {
-		var gs;
-		m = Matrix[[1, 2, 6], [-1, 4, 3], [5, 3, 1]];
+		var gs, previous;
+		m = Matrix[[0, 3, 4], [1, 0, 1], [1, 1, 3]];
 		gs = m.gramSchmidt();
-		this.assertEquals(gs, Matrix[Vector[ 0.15617376565933, 0.31234753131866, 0.93704259395599 ], Vector[ -0.0091589074581861, 0.14654251933098, 0.9891619682312 ], Vector[ 0.0004277431871742, 0.065701350569725, 0.9978392124176 ]]);
-		(gs * gs.transpose).print;
+		this.assertEquals(gs, Matrix[Vector[ 0.0, 0.60000002384186, 0.80000001192093 ], Vector[ 0.85749292373657, -0.411596596241, 0.30869746208191 ], Vector[ -0.058442804962397, 0.51819270849228, 0.85326474905014 ]]);
+
+		// Everything is ortho to zero vector.
+		previous = Vector[0, 0, 0];
+		gs.do {
+			arg vector, i;
+			this.assert(vector.orthogonalTo(previous), "Each Gram Schmidt vector is orthogonal to the one before it.");
+			previous = vector;
+		}
+	}
+
+	test_qr {
+		m = Matrix[[-1, 1, -1, 1], [-1, 3, -1, 3], [1, 3, 5, 7]];
+		MatrixSolver.qr(m).postln;
 	}
 
 	test_powerIteration {
