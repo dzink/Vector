@@ -371,31 +371,15 @@ Matrix[slot] : Array {
 	 Frobenius norm.
 	 */
 	froNorm {
-		var f = this.flatten;
-		^ f.collect({
-			arg n;
-			n.squared;
-		}).sum.sqrt;
+		^ MatrixNorm.froNorm(this);
 	}
 
 	infNorm {
-		var max = 0;
-		this.rows().do {
-			arg vector;
-			var sum = vector.abs().sum();
-			max = max(sum, max);
-		};
-		^ max
+		^ MatrixNorm.infNorm(this);
 	}
 
 	l1 {
-		var max = 0;
-		this.do {
-			arg vector;
-			var sum = vector.abs().sum();
-			max = max(sum, max);
-		};
-		^ max
+		^ MatrixNorm.l1(this);
 	}
 
 	determinant {
