@@ -7,6 +7,13 @@ Vector[float] : FloatArray {
     ^ v;
   }
 
+  *e1 {
+    arg size, i, scalar = 1;
+    var v = Vector.newClear(size);
+    v[i] = scalar;
+    ^ v;
+  }
+
   addSafe {
     arg element;
     if (this.size + 1 > this.maxSize) {

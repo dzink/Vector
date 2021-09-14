@@ -16,6 +16,10 @@ VectorTest : VectorAbstractTest {
 		this.assertFloatEquals(v[2], 0, "2 element is correctly empty");
 	}
 
+	test_e1 {
+		this.assertEquals(Vector.e1(5, 2, 2), Vector[0, 0, 2, 0, 0], "e1 correctly generates a scalar vector.");
+	}
+
 	test_createFilled {
 		v = Vector[1, 0, -4, -2.3];
 		this.assertEquals(v.size, 4, "Max size is correctly set.");
